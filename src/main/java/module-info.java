@@ -1,4 +1,4 @@
-module org.example.arkanoid {
+module Game {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -6,6 +6,7 @@ module org.example.arkanoid {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
+    requires javafx.graphics;
 
     opens Game to javafx.fxml;
     exports Game;
