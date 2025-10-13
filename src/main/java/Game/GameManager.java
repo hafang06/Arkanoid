@@ -1,4 +1,5 @@
 package Game;
+import Game.Brick.Brick;
 
 public class GameManager {
     private Paddle paddle;
