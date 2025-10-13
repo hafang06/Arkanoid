@@ -1,5 +1,6 @@
 package Game.Brick;
 
+import Game.Ball;
 import Game.GameObject;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -8,15 +9,21 @@ import javafx.scene.paint.Color;
 public class Brick extends GameObject {
     protected int hitPoints;
     protected Color color;
+    private static final int DEFAULT_WIDTH = 50;
+    private static final int DEFAULT_HEIGHT = 20;
 
     public Brick(int x, int y, int hitPoints, Color color) {
-        super(x, y, 300, 100);
+        super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
         this.hitPoints = hitPoints;
         this.color=color;
     }
 
-    public void takeHit() {
-        if (hitPoints > 0) {
+    public boolean intersects(Ball ball){
+        //if(điểm cao nhất của đường tròn nằm trong brick) return true;
+        return true;
+    }
+    public void takeHit(Ball ball) {
+        if (hitPoints > 0 && intersects(ball)) {
             this.hitPoints--;
         }
     }
