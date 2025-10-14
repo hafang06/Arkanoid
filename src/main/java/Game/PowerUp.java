@@ -16,7 +16,7 @@ public abstract class PowerUp extends GameObject {
     public abstract void removeEffect(Paddle paddle);
 
     @Override
-    public void update() {}
+    public void update(double deltaTime) {}
     @Override
     public void render(GraphicsContext gc) {}
 }
