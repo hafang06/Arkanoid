@@ -1,34 +1,22 @@
 package Game;
 
+import javafx.scene.canvas.GraphicsContext;
+
 public abstract class PowerUp extends GameObject {
-
     protected String type;
-    protected double duration; // int -=> double
-    protected double dy = 2.0; // tốc độ trơi
+    protected int duration;
 
-    public PowerUp(int x, int y, int width, int height, String type, double duration) {
+    public PowerUp(int x, int y, int width, int height, String type, int duration) {
         super(x, y, width, height);
         this.type = type;
         this.duration = duration;
-    }
-
-    public String getType() {
-        return type;
-    }
-    public double getDuration() {
-        return  duration;
     }
 
     public abstract void applyEffect(Paddle paddle);
     public abstract void removeEffect(Paddle paddle);
 
     @Override
-    public void update() {
-        this.y += dy;
-    }
-
+    public void update(double deltaTime) {}
     @Override
-    public void render() {
-        // thêm ảnh ở đây
-    }
+    public void render(GraphicsContext gc) {}
 }

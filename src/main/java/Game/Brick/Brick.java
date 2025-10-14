@@ -30,7 +30,7 @@ public class Brick extends GameObject {
     public boolean isDestroyed() { return hitPoints <= 0; }
 
     @Override
-    public void update() {
+    public void update(double deltaTime) {
 
     }
 

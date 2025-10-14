@@ -33,7 +33,7 @@ public class Paddle extends MovableObject {
 
     @Override
     // cap nhat vi tri
-    public void update() {
+    public void update(double deltaTime) {
         move();
     }
     @Override

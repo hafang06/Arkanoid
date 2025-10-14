@@ -84,7 +84,7 @@ public class Ball extends MovableObject {
 
     @Override
     // Cap nhat vi tri sau moi frame
-    public void update() {
+    public void update(double deltaTime) {
         move();
     }
 
