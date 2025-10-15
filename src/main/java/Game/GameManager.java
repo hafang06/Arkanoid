@@ -25,8 +25,15 @@ public class GameManager {
     //init renderer and paddle's position and size
     public GameManager(GraphicsContext gc) {
         renderer = new Renderer(gc);
-        paddle = new Paddle(screenWidth / 2 - 50, screenHeight - 40, 100, 20, 50);
+        paddle = new Paddle(screenWidth / 2 - 50, screenHeight - 40, 100, 20, 1);
+        //ball = new Ball();
+        int ballSize = 15;
+        int ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
+        int ballY = paddle.getY() - ballSize - 2; // đặt ngay trên paddle, cách 2px
+
+        ball = new Ball(ballX, ballY, ballSize, 4);
         objects.add(paddle);
+        objects.add(ball);
     }
 
     //update all object every frame
@@ -47,10 +54,15 @@ public class GameManager {
 
     //current movement
     public void handleInput() {
-        if(leftPressed) paddle.moveLeft();
-        if(rightPressed) paddle.moveRight();
-        else paddle.stop();
+        if (leftPressed) {
+            paddle.moveLeft();
+        } else if (rightPressed) {
+            paddle.moveRight();
+        } else {
+            paddle.stop();
+        }
     }
+
 
 
     public void onKeyPressed(KeyCode key) {

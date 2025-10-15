@@ -12,7 +12,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     public void applyEffect(Paddle paddle) {
         if (isActive) return;
         isActive = true;
-        paddle.setWidth(paddle.getWidth() + deltaWidth)
+        paddle.setWidth(paddle.getWidth() + deltaWidth);
 
     }
 
