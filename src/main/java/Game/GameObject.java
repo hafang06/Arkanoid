@@ -4,27 +4,27 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public abstract class GameObject {
-    protected int x, y;
+    protected double x, y;
     protected int width, height;
 
-    public GameObject(int x, int y, int width, int height) {
+    public GameObject(double x, double y, int width, int height) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 
