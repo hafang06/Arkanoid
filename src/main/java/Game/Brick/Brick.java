@@ -18,12 +18,8 @@ public class Brick extends GameObject {
         this.color=color;
     }
 
-    public boolean intersects(Ball ball){
-        //if(điểm cao nhất của đường tròn nằm trong brick) return true;
-        return true;
-    }
     public void takeHit(Ball ball) {
-        if (hitPoints > 0 && intersects(ball)) {
+        if (hitPoints > 0) {
             this.hitPoints--;
         }
     }
