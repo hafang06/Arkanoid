@@ -1,5 +1,7 @@
 package Game;
 
+import javafx.scene.canvas.GraphicsContext;
+
 public abstract class PowerUp extends GameObject {
 
     protected String type;
@@ -28,7 +30,7 @@ public abstract class PowerUp extends GameObject {
     }
 
     @Override
-    public void render() {
+    public void render(GraphicsContext gc) {
         // thêm ảnh ở đây
     }
 }

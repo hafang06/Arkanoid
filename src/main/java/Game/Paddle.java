@@ -24,12 +24,12 @@ public class Paddle extends MovableObject {
 
     // Di chuyển sang trái
     public void moveLeft() {
-        dx -= speed;
+        dx = -speed;
     }
 
     // Di chuyển sang phải
     public void moveRight() {
-        dx += speed;
+        dx = speed;
     }
 
     // Ngừng di chuyển
