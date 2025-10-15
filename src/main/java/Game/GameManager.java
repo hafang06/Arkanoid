@@ -31,7 +31,7 @@ public class GameManager {
         double ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
         double ballY = paddle.getY() - ballSize - 2; // đặt ngay trên paddle, cách 2px
 
-        ball = new Ball(ballX, ballY, ballSize, 4);
+        ball = new Ball(ballX, ballY, ballSize, 6);
 
 
         //add demo bricks for testing

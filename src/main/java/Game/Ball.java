@@ -14,6 +14,11 @@ public class Ball extends MovableObject {
         this.speed = speed;
         this.directionX = 1;
         this.directionY = -1;
+        double len = Math.sqrt(directionX * directionX + directionY * directionY);
+        if (len != 0) {
+            this.directionX /= len;
+            this.directionY /= len;
+        }
     }
 
     public int getSpeed() {
