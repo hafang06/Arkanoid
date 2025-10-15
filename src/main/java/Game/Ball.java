@@ -16,6 +16,30 @@ public class Ball extends MovableObject {
         this.directionY = -1;
     }
 
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public double getDirectionX() {
+        return directionX;
+    }
+
+    public void setDirectionX(double directionX) {
+        this.directionX = directionX;
+    }
+
+    public double getDirectionY() {
+        return directionY;
+    }
+
+    public void setDirectionY(double directionY) {
+        this.directionY = directionY;
+    }
+
     public void bounceOff(GameObject other) {
         if (other instanceof Paddle) {
             Paddle paddle = (Paddle) other;
@@ -108,11 +132,11 @@ public class Ball extends MovableObject {
             directionX *= -1;
         }
         //them sau khi co screen width
-//        else if (x + width >= WIDTH) {
-//            x = WIDTH - width;
-//            directionX *= -1;
-//        }
-//
+        else if (x + width >= 800) {
+            x = 800 - width;
+            directionX *= -1;
+        }
+
         if (y <= 0) {
             y = 0;
             directionY *= -1;

@@ -8,7 +8,7 @@ public class Renderer {
 
     //init renderer;
     public Renderer(GraphicsContext _gc){
-        this.gc = gc;
+        this.gc = _gc;
     }
 
     //clear the screen for next draw

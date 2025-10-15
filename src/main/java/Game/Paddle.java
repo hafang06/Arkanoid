@@ -6,50 +6,59 @@ import javafx.scene.paint.Color;
 public class Paddle extends MovableObject {
     private int speed;
     private PowerUp currentPowerUp;
+    private Ball ball; // 👈 Thêm biến này để Paddle biết quả bóng nó đang tương tác
 
-    /**
-     * Phuong thuc khoi tao
-     */
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, 0, 0);
         this.speed = speed;
     }
 
-    // Di chuyen sang trai
+    // 👇 Thêm getter & setter cho ball
+    public Ball getBall() {
+        return ball;
+    }
+
+    public void setBall(Ball ball) {
+        this.ball = ball;
+    }
+
+    // Di chuyển sang trái
     public void moveLeft() {
         dx -= speed;
     }
 
-    // Di chuyen sang phai
+    // Di chuyển sang phải
     public void moveRight() {
         dx += speed;
     }
 
-    // Ngung di chuyen
+    // Ngừng di chuyển
     public void stop() {
         dx = 0;
     }
-    public void applyPowerUp(PowerUp p) {}
+
+    // Áp dụng PowerUp
+    public void applyPowerUp(PowerUp p) {
+        this.currentPowerUp = p;
+        p.applyEffect(this);
+    }
 
     @Override
-    // cap nhat vi tri
     public void update(double deltaTime) {
         move();
     }
+
     @Override
-    // ve qua bong
     public void render(GraphicsContext gc) {
         gc.setFill(Color.DEEPSKYBLUE);
         gc.fillRect(x, y, width, height);
     }
+
     @Override
-    // cap nhat vi tri thanh paddle
     public void move() {
         x += dx;
-        if ( x < 0) x = 0;
-        // Bo sung sau khi da co chieu dai man hinh
-//        if (x + width > Game.Width) {
-//            x = Game.Width - width;
-//        }
+        if (x < 0) x = 0;
+        // Bổ sung sau khi có chiều rộng màn hình
+        if (x + width > 800) x = 800 - width;
     }
 }
