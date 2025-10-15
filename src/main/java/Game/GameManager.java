@@ -25,15 +25,19 @@ public class GameManager {
     //init renderer and paddle's position and size
     public GameManager(GraphicsContext gc) {
         renderer = new Renderer(gc);
-        paddle = new Paddle(screenWidth / 2 - 50, screenHeight - 40, 100, 20, 1);
+        paddle = new Paddle(screenWidth / 2 - 50, screenHeight - 40, 100, 20, 4);
         //ball = new Ball();
         int ballSize = 15;
         int ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
         int ballY = paddle.getY() - ballSize - 2; // đặt ngay trên paddle, cách 2px
 
-        ball = new Ball(ballX, ballY, ballSize, 4);
-        objects.add(paddle);
-        objects.add(ball);
+        ball = new Ball(ballX, ballY, ballSize, 2);
+
+
+        //add demo bricks for testing
+        for(int i = 1; i <= 5; i++) {
+            objects.add(new Brick(100 * i, 120, 3, Color.BLUE));
+        }
     }
 
     //update all object every frame
@@ -42,6 +46,26 @@ public class GameManager {
         for(GameObject obj : objects){
             obj.update(deltaTime);
         }
+
+        //check if ball is touching any brick
+        for(GameObject obj : objects){
+            if(ball.checkCollision(obj)){
+                ball.bounceOff(obj);
+
+                //if ball touched the brick then brick -1 hp
+                if(obj instanceof Brick){
+                    ((Brick) obj).takeHit(ball);
+                }
+            }
+        }
+
+        //check touching the paddle
+        if(ball.checkCollision(paddle)){
+            ball.bounceOff(paddle);
+        }
+
+        ball.update(deltaTime);
+        paddle.update(deltaTime);
     }
 
     //render all object every frame
@@ -50,6 +74,8 @@ public class GameManager {
         for (GameObject obj : objects) {
             renderer.draw(obj);
         }
+        renderer.draw(ball);
+        renderer.draw(paddle);
     }
 
     //current movement
