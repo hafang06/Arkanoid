@@ -8,7 +8,7 @@ public class Paddle extends MovableObject {
     private PowerUp currentPowerUp;
     private Ball ball; // 👈 Thêm biến này để Paddle biết quả bóng nó đang tương tác
 
-    public Paddle(int x, int y, int width, int height, int speed) {
+    public Paddle(double x, double y, int width, int height, int speed) {
         super(x, y, width, height, 0, 0);
         this.speed = speed;
     }

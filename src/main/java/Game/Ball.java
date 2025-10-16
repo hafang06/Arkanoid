@@ -9,11 +9,16 @@ public class Ball extends MovableObject {
     private int speed;
     private double  directionX, directionY;
 
-    public Ball(int x, int y, int size, int speed) {
+    public Ball(double x, double y, int size, int speed) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
         this.directionX = 1;
         this.directionY = -1;
+        double len = Math.sqrt(directionX * directionX + directionY * directionY);
+        if (len != 0) {
+            this.directionX /= len;
+            this.directionY /= len;
+        }
     }
 
     public int getSpeed() {
@@ -56,7 +61,12 @@ public class Ball extends MovableObject {
             directionX = Math.sin(bounceAngle);
             directionY = -Math.cos(bounceAngle);
 
+            double len = Math.sqrt(directionX * directionX + directionY * directionY);
+            directionX /= len;
+            directionY /= len;
+
             y = paddle.y - height - 1;
+
 
             return;
         }
@@ -88,6 +98,7 @@ public class Ball extends MovableObject {
             directionY *= -1;
         }
     }
+
 
     //Kiem tra va cham vs cac vat the khac
     public boolean checkCollision(GameObject other) {
@@ -130,16 +141,20 @@ public class Ball extends MovableObject {
         if (x <= 0) {
             x = 0;
             directionX *= -1;
+            x += directionX * speed;
         }
         //them sau khi co screen width
         else if (x + width >= 800) {
             x = 800 - width;
             directionX *= -1;
+            x += directionX * speed;
         }
 
         if (y <= 0) {
             y = 0;
             directionY *= -1;
+            y += directionY * speed;
         }
+
     }
 }
