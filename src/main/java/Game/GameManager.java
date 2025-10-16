@@ -1,5 +1,9 @@
 package Game;
 import Game.Brick.Brick;
+import Game.Brick.unBreakBrick;
+import Game.Map.Map;
+import Game.Map.Map1;
+import Game.Map.Map2;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -14,10 +18,11 @@ public class GameManager {
     private List<GameObject> objects = new ArrayList<>();
     private Paddle paddle;
     private Ball ball;
-    private List<Brick> bricks;
+    private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score;
     private int lives;
+    private List<Map> maps=new ArrayList<>();
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -35,9 +40,8 @@ public class GameManager {
 
 
         //add demo bricks for testing
-        for(int i = 1; i <= 5; i++) {
-            objects.add(new Brick(100 * i, 120, 3, Color.BLUE));
-        }
+        maps.add(new Map1());
+        maps.get(0).addBricks(bricks);
     }
 
     //update all object every frame
@@ -46,16 +50,19 @@ public class GameManager {
         for(GameObject obj : objects){
             obj.update(deltaTime);
         }
+        for(Brick brick : bricks){
+            brick.update(deltaTime);
+        }
+
+
 
         //check if ball is touching any brick
-        for(GameObject obj : objects){
-            if(ball.checkCollision(obj)){
-                ball.bounceOff(obj);
+        for(Brick brick : bricks){
+            if(ball.checkCollision(brick)){
+                ball.bounceOff(brick);
 
                 //if ball touched the brick then brick -1 hp
-                if(obj instanceof Brick){
-                    ((Brick) obj).takeHit(ball);
-                }
+                brick.takeHit(ball);
             }
         }
 
@@ -71,8 +78,8 @@ public class GameManager {
     //render all object every frame
     public void render() {
         renderer.clear(screenWidth, screenHeight);
-        for (GameObject obj : objects) {
-            renderer.draw(obj);
+        for (Brick brick : bricks) {
+            renderer.draw(brick);
         }
         renderer.draw(ball);
         renderer.draw(paddle);
