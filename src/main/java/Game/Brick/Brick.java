@@ -27,7 +27,10 @@ public class Brick extends GameObject {
 
     @Override
     public void update(double deltaTime) {
-
+        if (this.isDestroyed()) {
+            this.setX(1000);
+            this.setY(1000);
+        }
     }
 
     public void setColorByHitPoints() {
