@@ -21,6 +21,8 @@ public class GameManager {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+    private boolean tabPressed = false;
+    private boolean gameStarted = false;//check if game started or not
 
     //init renderer and paddle's position and size
     public GameManager(GraphicsContext gc) {
@@ -31,7 +33,7 @@ public class GameManager {
         double ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
         double ballY = paddle.getY() - ballSize - 2; // đặt ngay trên paddle, cách 2px
 
-        ball = new Ball(ballX, ballY, ballSize, 6);
+        ball = new Ball(ballX, ballY, ballSize, 4);
 
 
         //add demo bricks for testing
@@ -43,11 +45,11 @@ public class GameManager {
     //update all object every frame
     public void updateGame(double deltaTime) {
         handleInput();
-        for(GameObject obj : objects){
-            obj.update(deltaTime);
-        }
+        if(!gameStarted) return;
 
         //check if ball is touching any brick
+        int destroyedBrick = -1;
+        int index = 0;
         for(GameObject obj : objects){
             if(ball.checkCollision(obj)){
                 ball.bounceOff(obj);
@@ -55,10 +57,19 @@ public class GameManager {
                 //if ball touched the brick then brick -1 hp
                 if(obj instanceof Brick){
                     ((Brick) obj).takeHit(ball);
+                    if(((Brick) obj).isDestroyed()){
+                        destroyedBrick = index;
+                    }
                 }
             }
+            index++;
         }
+        if(destroyedBrick != -1) objects.remove(destroyedBrick);
 
+
+        for(GameObject obj : objects){
+            obj.update(deltaTime);
+        }
         //check touching the paddle
         if(ball.checkCollision(paddle)){
             ball.bounceOff(paddle);
@@ -80,6 +91,7 @@ public class GameManager {
 
     //current movement
     public void handleInput() {
+        if(tabPressed) gameStarted = true;
         if (leftPressed) {
             paddle.moveLeft();
         } else if (rightPressed) {
@@ -94,11 +106,13 @@ public class GameManager {
     public void onKeyPressed(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
+        if(key == KeyCode.TAB) tabPressed = true;
     }
 
     public void onKeyReleased(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
+        if(key == KeyCode.TAB) tabPressed = true;
     }
 
     public void checkCollisions() {}
