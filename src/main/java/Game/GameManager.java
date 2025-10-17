@@ -21,7 +21,7 @@ public class GameManager {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-    private boolean tabPressed = false;
+    private boolean spacePressed = false;
     private boolean gameStarted = false;//check if game started or not
 
     //init renderer and paddle's position and size
@@ -91,7 +91,7 @@ public class GameManager {
 
     //current movement
     public void handleInput() {
-        if(tabPressed) gameStarted = true;
+        if(spacePressed) gameStarted = true;
         if (leftPressed) {
             paddle.moveLeft();
         } else if (rightPressed) {
@@ -106,13 +106,13 @@ public class GameManager {
     public void onKeyPressed(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
-        if(key == KeyCode.TAB) tabPressed = true;
+        if(key == KeyCode.TAB) spacePressed = true;
     }
 
     public void onKeyReleased(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
-        if(key == KeyCode.TAB) tabPressed = true;
+        if(key == KeyCode.SPACE) spacePressed = true;
     }
 
     public void checkCollisions() {}
