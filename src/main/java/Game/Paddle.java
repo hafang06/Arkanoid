@@ -13,6 +13,7 @@ public class Paddle extends MovableObject {
         this.speed = speed;
     }
 
+
     // 👇 Thêm getter & setter cho ball
     public Ball getBall() {
         return ball;
