@@ -11,14 +11,18 @@ import java.util.List;
 
 public class Map {
     protected int numOfBricks;
+    protected List<Brick> bricks;
+
+    public List<Brick> getBricks() {
+        return bricks;
+    }
 
     public Map(int numOfBricks){
         this.numOfBricks=numOfBricks;
+        bricks = new ArrayList<>();
     }
 
     public int getNumOfBricks() {
         return numOfBricks;
     }
-
-    public void addBricks(List<Brick> objs){}
 }

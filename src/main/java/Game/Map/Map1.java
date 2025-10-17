@@ -12,16 +12,17 @@ public class Map1 extends Map{
 
     public Map1(){
         super(24);
+        addBricks();
     }
-    public void addBricks(List<Brick> objs){
+    public void addBricks(){
         for(int i=0;i<8;i++){
-            objs.add( new Brick3Hp(i*100,100));
+            bricks.add( new Brick3Hp(i*100,100));
         }
         for(int i=0;i<8;i++){
-            objs.add(new Brick2Hp(50+i*100,120));
+            bricks.add(new Brick2Hp(50+i*100,120));
         }
         for(int i=0;i<8;i++){
-            objs.add( new Brick1Hp(i*100,140));
+            bricks.add( new Brick1Hp(i*100,140));
         }
     }
 }
