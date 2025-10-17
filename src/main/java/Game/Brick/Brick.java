@@ -28,21 +28,10 @@ public class Brick extends GameObject {
         this.hitPoints = hitPoints;
     }
 
-    public Color getColor() {
-        return color;
-    }
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public Brick(int x, int y, int hitPoints, Color color) {
+    public Brick(int x, int y, int hitPoints) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
         this.hitPoints = hitPoints;
-    }
-
-    public int getHitPoints() {
-        return hitPoints;
     }
 
     public void takeHit(Ball ball) {
@@ -55,10 +44,6 @@ public class Brick extends GameObject {
 
     @Override
     public void update(double deltaTime) {
-        if (this.getHitPoints()<=0) {
-            this.setX(1000);
-            this.setY(1000);
-        }
         setImageByHitPoints();
     }
 
