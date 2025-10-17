@@ -1,5 +1,9 @@
 package Game;
 import Game.Brick.Brick;
+import Game.Brick.unBreakBrick;
+import Game.Map.Map;
+import Game.Map.Map1;
+import Game.Map.Map2;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -14,10 +18,11 @@ public class GameManager {
     private List<GameObject> objects = new ArrayList<>();
     private Paddle paddle;
     private Ball ball;
-    private List<Brick> bricks;
+    private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score;
     private int lives;
+    private List<Map> maps=new ArrayList<>();
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -56,6 +61,11 @@ public class GameManager {
             ball = new Ball(x, y, ballSize, 4);
             return;
         }
+        for(Brick brick : bricks){
+            brick.update(deltaTime);
+        }
+
+
 
         //check if ball is touching any brick
         int destroyedBrick = -1;
@@ -92,8 +102,8 @@ public class GameManager {
     //render all object every frame
     public void render() {
         renderer.clear(screenWidth, screenHeight);
-        for (GameObject obj : objects) {
-            renderer.draw(obj);
+        for (Brick brick : bricks) {
+            renderer.draw(brick);
         }
         renderer.draw(ball);
         renderer.draw(paddle);
