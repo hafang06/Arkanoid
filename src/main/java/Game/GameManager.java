@@ -42,12 +42,8 @@ public class GameManager {
 
 
         //add demo bricks for testing
-        for(int j = 1; j <= 6; j++){
-            for(int i = 1; i <= 40; i++) {
-                bricks.add(new Brick(50 * i, 20*j, 3));
-            }
-
-        }
+        maps.add(new Map1());
+        bricks=maps.get(0).getBricks();
     }
 
     //update all object every frame
@@ -82,7 +78,7 @@ public class GameManager {
             }
             index++;
         }
-        if(destroyedBrick != -1) objects.remove(destroyedBrick);
+        if(destroyedBrick != -1) bricks.remove(destroyedBrick);
 
 
         for(GameObject obj : objects){
