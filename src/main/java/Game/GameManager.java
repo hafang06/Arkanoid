@@ -21,7 +21,7 @@ public class GameManager {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-    private boolean tabPressed = false;
+    private boolean spacePressed = false;
     private boolean gameStarted = false;//check if game started or not
 
     //init renderer and paddle's position and size
@@ -37,15 +37,25 @@ public class GameManager {
 
 
         //add demo bricks for testing
-        for(int i = 1; i <= 5; i++) {
-            objects.add(new Brick(100 * i, 120, 3, Color.BLUE));
+        for(int j = 1; j <= 6; j++){
+            for(int i = 1; i <= 40; i++) {
+                objects.add(new Brick(50 * i, 20*j, 3, Color.BLUE));
+            }
+
         }
     }
 
     //update all object every frame
     public void updateGame(double deltaTime) {
         handleInput();
-        if(!gameStarted) return;
+        if(!gameStarted){
+            int ballSize = 15;
+            paddle.update(deltaTime);
+            double x = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;;
+            double y = paddle.getY() - ballSize - 2;
+            ball = new Ball(x, y, ballSize, 4);
+            return;
+        }
 
         //check if ball is touching any brick
         int destroyedBrick = -1;
@@ -91,7 +101,7 @@ public class GameManager {
 
     //current movement
     public void handleInput() {
-        if(tabPressed) gameStarted = true;
+        if(spacePressed) gameStarted = true;
         if (leftPressed) {
             paddle.moveLeft();
         } else if (rightPressed) {
@@ -106,13 +116,13 @@ public class GameManager {
     public void onKeyPressed(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
-        if(key == KeyCode.TAB) tabPressed = true;
+        if(key == KeyCode.TAB) spacePressed = true;
     }
 
     public void onKeyReleased(KeyCode key) {
         if (key == KeyCode.LEFT) leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
-        if(key == KeyCode.TAB) tabPressed = true;
+        if(key == KeyCode.SPACE) spacePressed = true;
     }
 
     public void checkCollisions() {}
