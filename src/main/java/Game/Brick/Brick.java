@@ -5,7 +5,8 @@ import Game.GameObject;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Brick extends GameObject {
     protected int hitPoints;
@@ -19,7 +20,23 @@ public class Brick extends GameObject {
     private static final Image Brick5 = new Image(Brick.class.getResource("/Image/red.png").toExternalForm());
     private static final Image unbreak_Brick = new Image(Brick.class.getResource("/Image/unbreak.png").toExternalForm());
 
-    public Brick(int x, int y, int hitPoints) {
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Brick(int x, int y, int hitPoints, Color color) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
         this.hitPoints = hitPoints;
     }
@@ -34,6 +51,7 @@ public class Brick extends GameObject {
         }
     }
     public boolean isDestroyed() { return hitPoints <= 0; }
+
 
     @Override
     public void update(double deltaTime) {

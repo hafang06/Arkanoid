@@ -2,23 +2,25 @@ package Game;
 import Game.Brick.Brick;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.geometry.Rectangle2D;
 
 public class Ball extends MovableObject {
     private int speed;
     private double  directionX, directionY;
+    private Image image;
 
     public Ball(double x, double y, int size, int speed) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
-        this.directionX = 1;
+        this.directionX = 0;
         this.directionY = -1;
+        image = new Image(getClass().getResourceAsStream("/Image/ball.png"));
         double len = Math.sqrt(directionX * directionX + directionY * directionY);
-        if (len != 0) {
-            this.directionX /= len;
-            this.directionY /= len;
-        }
+        directionX /= len;
+        directionY /= len;
+
     }
 
     public int getSpeed() {
@@ -126,10 +128,18 @@ public class Ball extends MovableObject {
     @Override
     // ve hinh qua bong
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
-        gc.fillOval(x, y, width, height);
-        gc.setStroke(Color.GRAY);
-        gc.strokeOval(x, y, width, height);
+        double scale = 1.5; // hoặc 3.0 nếu muốn to hơn
+        double drawWidth = width * scale;
+        double drawHeight = height * scale;
+
+        if (image != null) {
+            gc.drawImage(image, x, y, drawWidth, drawHeight);
+        } else {
+            gc.setFill(Color.WHITE);
+            gc.fillOval(x, y, drawWidth, drawHeight);
+            gc.setStroke(Color.GRAY);
+            gc.strokeOval(x, y, drawWidth, drawHeight);
+        }
     }
 
     @Override
