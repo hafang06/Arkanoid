@@ -37,15 +37,25 @@ public class GameManager {
 
 
         //add demo bricks for testing
-        for(int i = 1; i <= 5; i++) {
-            objects.add(new Brick(100 * i, 120, 3, Color.BLUE));
+        for(int j = 1; j <= 6; j++){
+            for(int i = 1; i <= 40; i++) {
+                objects.add(new Brick(50 * i, 20*j, 3, Color.BLUE));
+            }
+
         }
     }
 
     //update all object every frame
     public void updateGame(double deltaTime) {
         handleInput();
-        if(!gameStarted) return;
+        if(!gameStarted){
+            int ballSize = 15;
+            paddle.update(deltaTime);
+            double x = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;;
+            double y = paddle.getY() - ballSize - 2;
+            ball = new Ball(x, y, ballSize, 4);
+            return;
+        }
 
         //check if ball is touching any brick
         int destroyedBrick = -1;
