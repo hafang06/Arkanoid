@@ -4,13 +4,30 @@ import Game.Ball;
 import Game.GameObject;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Brick extends GameObject {
     protected int hitPoints;
     protected Color color;
     private static final int DEFAULT_WIDTH = 50;
     private static final int DEFAULT_HEIGHT = 20;
+
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 
     public Brick(int x, int y, int hitPoints, Color color) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
@@ -24,6 +41,7 @@ public class Brick extends GameObject {
         }
     }
     public boolean isDestroyed() { return hitPoints <= 0; }
+
 
     @Override
     public void update(double deltaTime) {

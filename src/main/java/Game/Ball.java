@@ -12,7 +12,7 @@ public class Ball extends MovableObject {
     public Ball(double x, double y, int size, int speed) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
-        this.directionX = 1;
+        this.directionX = 0;
         this.directionY = -1;
         double len = Math.sqrt(directionX * directionX + directionY * directionY);
         directionX /= len;
