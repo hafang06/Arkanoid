@@ -1,16 +1,19 @@
 package Game;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Paddle extends MovableObject {
     private int speed;
     private PowerUp currentPowerUp;
-    private Ball ball; // 👈 Thêm biến này để Paddle biết quả bóng nó đang tương tác
+    private Ball ball;// 👈 Thêm biến này để Paddle biết quả bóng nó đang tương tác
+    private Image image;
 
     public Paddle(double x, double y, int width, int height, int speed) {
         super(x, y, width, height, 0, 0);
         this.speed = speed;
+        image = new Image(getClass().getResourceAsStream("/Image/Paddle.png"));
     }
 
 
@@ -51,8 +54,8 @@ public class Paddle extends MovableObject {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.DEEPSKYBLUE);
-        gc.fillRect(x, y, width, height);
+        gc.drawImage(image, x, y, width , height );
+
     }
 
     @Override
