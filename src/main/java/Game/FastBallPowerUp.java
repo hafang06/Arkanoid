@@ -3,6 +3,7 @@ package Game;
 public class FastBallPowerUp extends PowerUp {
     private final int deltaSpeed = 4;
     private boolean isActive = false;
+    private int originalSpeed;        // lưu speed gốc
 
     public FastBallPowerUp(int x, int y) {
         super(x, y, 20, 20, "FastBall", 10);
@@ -11,20 +12,20 @@ public class FastBallPowerUp extends PowerUp {
     @Override
     public void applyEffect(Paddle paddle) {
         if (isActive) return;
-        isActive = true;
         Ball ball = paddle.getBall();
-        if (ball != null) {
-            ball.setSpeed(ball.getSpeed() + deltaSpeed);
-        }
+        if (ball == null) return;
+        isActive = true;
+        originalSpeed = ball.getSpeed();
+        ball.setSpeed(originalSpeed + deltaSpeed);
     }
 
     @Override
     public void removeEffect(Paddle paddle) {
         if (!isActive) return;
-        isActive = false;
         Ball ball = paddle.getBall();
+        isActive = false;
         if (ball != null) {
-            ball.setSpeed(Math.max(1, ball.getSpeed() - deltaSpeed));
+            ball.setSpeed(originalSpeed);
         }
     }
 }
