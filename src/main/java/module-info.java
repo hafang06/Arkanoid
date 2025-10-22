@@ -7,6 +7,7 @@ module Game {
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
     requires javafx.graphics;
+    //requires Game;
 
     opens Game to javafx.fxml;
     exports Game;

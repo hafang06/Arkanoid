@@ -44,6 +44,6 @@ public abstract class GameObject {
         this.height = height;
     }
 
-    public abstract void update(double deltaTime);
+    public abstract void update(double deltaTime,int leftWall, int rightWall);
     public abstract void render(GraphicsContext gc);
 }

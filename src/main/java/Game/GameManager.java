@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
-    private final int screenWidth = 800;
-    private final int screenHeight = 600;
+    public static final int screenWidth = 800;
+    public static final int screenHeight = 600;
     private Renderer renderer;
 
     private List<GameObject> objects = new ArrayList<>();
@@ -51,17 +51,15 @@ public class GameManager {
         handleInput();
         if(!gameStarted){
             int ballSize = 15;
-            paddle.update(deltaTime);
+            paddle.update(deltaTime,0,screenWidth);
             double x = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;;
             double y = paddle.getY() - ballSize - 2;
             ball = new Ball(x, y, ballSize, 4);
             return;
         }
         for(Brick brick : bricks){
-            brick.update(deltaTime);
+            brick.update(deltaTime,0,screenWidth);
         }
-
-
 
         //check if ball is touching any brick
         int destroyedBrick = -1;
@@ -82,15 +80,15 @@ public class GameManager {
 
 
         for(GameObject obj : objects){
-            obj.update(deltaTime);
+            obj.update(deltaTime,0,screenWidth);
         }
         //check touching the paddle
         if(ball.checkCollision(paddle)){
             ball.bounceOff(paddle);
         }
 
-        ball.update(deltaTime);
-        paddle.update(deltaTime);
+            ball.update(deltaTime,0,screenWidth);
+            paddle.update(deltaTime,0,screenWidth);
     }
 
     //render all object every frame

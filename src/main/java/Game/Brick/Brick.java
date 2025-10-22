@@ -43,7 +43,7 @@ public class Brick extends GameObject {
 
 
     @Override
-    public void update(double deltaTime) {
+    public void update(double deltaTime,int leftWall, int rightWall) {
         setImageByHitPoints();
     }
 
@@ -76,4 +76,5 @@ public class Brick extends GameObject {
             gc.drawImage(image,x,y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
         }
     }
+
 }

@@ -4,7 +4,6 @@ import Game.Brick.Brick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.geometry.Rectangle2D;
 
 public class Ball extends MovableObject {
     private int speed;
@@ -14,7 +13,7 @@ public class Ball extends MovableObject {
     public Ball(double x, double y, int size, int speed) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
-        this.directionX = 0;
+        this.directionX = 0.5;
         this.directionY = -1;
         image = new Image(getClass().getResourceAsStream("/Image/ball.png"));
         double len = Math.sqrt(directionX * directionX + directionY * directionY);
@@ -121,8 +120,8 @@ public class Ball extends MovableObject {
 
     @Override
     // Cap nhat vi tri sau moi frame
-    public void update(double deltaTime) {
-        move();
+    public void update(double deltaTime,int leftWall, int rightWall) {
+        move(leftWall, rightWall);
     }
 
     @Override
@@ -143,19 +142,19 @@ public class Ball extends MovableObject {
     }
 
     @Override
-    public void move() {
+    public void move(int leftWall, int rightWall) {
         // Cập nhật vị trí theo hướng và tốc độ
         x += directionX * speed;
         y += directionY * speed;
 
-        if (x <= 0) {
-            x = 0;
+        if (x <= leftWall) {
+            x = leftWall;
             directionX *= -1;
             x += directionX * speed;
         }
         //them sau khi co screen width
-        else if (x + width >= 800) {
-            x = 800 - width;
+        else if (x + width >= rightWall) {
+            x = rightWall - width;
             directionX *= -1;
             x += directionX * speed;
         }

@@ -25,7 +25,7 @@ public abstract class PowerUp extends GameObject {
     public abstract void removeEffect(Paddle paddle);
 
     @Override
-    public void update(double deltaTime) {
+    public void update(double deltaTime, int leftWall, int rightWall) {
         this.y += dy;
     }
 

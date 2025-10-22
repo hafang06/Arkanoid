@@ -48,8 +48,8 @@ public class Paddle extends MovableObject {
     }
 
     @Override
-    public void update(double deltaTime) {
-        move();
+    public void update(double deltaTime,int leftWall, int rightWall) {
+        move(leftWall, rightWall);
     }
 
     @Override
@@ -59,10 +59,10 @@ public class Paddle extends MovableObject {
     }
 
     @Override
-    public void move() {
+    public void move(int leftWall, int rightWall) {
         x += dx;
-        if (x < 0) x = 0;
+        if (x < leftWall) x = leftWall;
         // Bổ sung sau khi có chiều rộng màn hình
-        if (x + width > 800) x = 800 - width;
+        if (x + width > rightWall ) x = rightWall - width;
     }
 }
