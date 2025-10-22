@@ -22,4 +22,12 @@ public class Renderer {
         // Vẽ object ra màn hình
         obj.render(gc);
     }
+
+    public GraphicsContext getGc() {
+        return gc;
+    }
+
+    public void setGc(GraphicsContext gc) {
+        this.gc = gc;
+    }
 }

@@ -27,5 +27,5 @@ public abstract class MovableObject extends GameObject {
         this.dy = dy;
     }
 
-    public abstract void move();
+    public abstract void move(int leftWall, int rightWall);
 }
