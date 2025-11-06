@@ -1,6 +1,7 @@
 package Game;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Renderer {
@@ -21,6 +22,9 @@ public class Renderer {
     public void draw(GameObject obj) {
         // Vẽ object ra màn hình
         obj.render(gc);
+    }
+    public void drawBackground(Image bg, double width, double height) {
+        gc.drawImage(bg, 0, 0, width, height);
     }
 
     public GraphicsContext getGc() {
