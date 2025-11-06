@@ -29,7 +29,7 @@ public class Brick extends GameObject {
     }
 
 
-    public Brick(int x, int y, int hitPoints) {
+    public Brick(double x, double y, int hitPoints) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
         this.hitPoints = hitPoints;
     }
