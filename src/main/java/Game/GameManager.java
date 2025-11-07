@@ -4,6 +4,7 @@ import Game.Brick.unBreakBrick;
 import Game.Map.Map;
 import Game.Map.Map1;
 import Game.Map.Map2;
+import Game.Map.Map3;
 import Game.PowerUp.PowerUp;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
@@ -52,7 +53,7 @@ public class GameManager {
 
 
         //add demo bricks for testing
-        maps.add(new Map1());
+        maps.add(new Map3());
         bricks=maps.get(0).getBricks();
     }
 
@@ -104,6 +105,7 @@ public class GameManager {
     //render all object every frame
     public void render() {
         renderer.clear(screenWidth, screenHeight);
+        renderer.getGc().drawImage(maps.get(0).getBackGround(), 0, 0, screenWidth, screenHeight);
         for (Brick brick : bricks) {
             renderer.draw(brick);
         }
