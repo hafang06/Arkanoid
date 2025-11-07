@@ -1,15 +1,12 @@
 package Game;
 import Game.Brick.Brick;
 import Game.Brick.unBreakBrick;
-import Game.Map.Map;
-import Game.Map.Map1;
-import Game.Map.Map2;
+import Game.Map.*;
 import Game.PowerUp.PowerUp;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +28,8 @@ public class GameManager {
     private List<PowerUp> powerUps;
     private int score = 0;
     private int lives = 3;
+    private Image BackGround;
+    private int currentLevel;
 
     private List<Map> maps=new ArrayList<>();
 
@@ -50,10 +49,31 @@ public class GameManager {
 
         ball = new Ball(ballX, ballY, ballSize, 4);
 
-
-        //add demo bricks for testing
         maps.add(new Map1());
-        bricks=maps.get(0).getBricks();
+        maps.add(new Map2());
+        maps.add(new Map3());
+        maps.add(new Map4());
+        maps.add(new Map5());
+
+        currentLevel = 1;
+        loadCurrentMap();
+    }
+
+    private void loadCurrentMap() {
+        Map currentMap = maps.get(currentLevel-1);
+        bricks = currentMap.getBricks();
+        BackGround = currentMap.getBackGround();
+
+        // Reset vị trí paddle & bóng
+        paddle.setX(screenWidth / 2 - paddle.getWidth() / 2);
+        paddle.setY(screenHeight - 40);
+
+        int ballSize = 15;
+        double ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
+        double ballY = paddle.getY() - ballSize - 2;
+        ball = new Ball(ballX, ballY, ballSize, 4);
+
+        gameStarted = false; // chờ người chơi nhấn space để bắt đầu lại
     }
 
     //update all object every frame
@@ -97,13 +117,27 @@ public class GameManager {
             ball.bounceOff(paddle);
         }
 
-            ball.update(deltaTime,0,screenWidth);
-            paddle.update(deltaTime,0,screenWidth);
+        ball.update(deltaTime,0,screenWidth);
+        paddle.update(deltaTime,0,screenWidth);
+
+        boolean check = true;
+        for(Brick br : bricks){
+            if(!(br instanceof unBreakBrick)){
+                check = false;
+            }
+        }
+        if (check) {
+            currentLevel++;
+            loadCurrentMap();
+        }
     }
 
     //render all object every frame
     public void render() {
         renderer.clear(screenWidth, screenHeight);
+        if (BackGround != null) {
+            renderer.drawBackground(BackGround, screenWidth, screenHeight);
+        }
         for (Brick brick : bricks) {
             renderer.draw(brick);
         }
