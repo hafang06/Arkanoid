@@ -1,6 +1,9 @@
-package Game;
+package Game.PowerUp;
 
-public class FastBallPowerUp extends PowerUp {
+import Game.Ball;
+import Game.Paddle;
+
+public class FastBallPowerUp extends PowerUp{
     private final int deltaSpeed = 4;
     private boolean isActive = false;
     private int originalSpeed;        // lưu speed gốc

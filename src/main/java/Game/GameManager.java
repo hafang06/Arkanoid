@@ -4,6 +4,7 @@ import Game.Brick.unBreakBrick;
 import Game.Map.Map;
 import Game.Map.Map1;
 import Game.Map.Map2;
+import Game.PowerUp.PowerUp;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;

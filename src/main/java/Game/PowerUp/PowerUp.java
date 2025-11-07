@@ -1,5 +1,7 @@
-package Game;
+package Game.PowerUp;
 
+import Game.GameObject;
+import Game.Paddle;
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class PowerUp extends GameObject {
