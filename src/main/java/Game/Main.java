@@ -19,8 +19,8 @@ public class Main extends Application {
         Canvas canvas = new Canvas(width, height);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        GameManager gm = new GameManager(gc);
-//        GameManager2Player gm = new GameManager2Player(gc);
+        //GameManager gm = new GameManager(gc);
+        GameManager2Player gm = new GameManager2Player(gc);
         Scene scene = new Scene(new StackPane(canvas));
         stage.setScene(scene);
         stage.setTitle("Arkanoid - JavaFX Skeleton");

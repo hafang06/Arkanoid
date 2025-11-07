@@ -1,6 +1,8 @@
-package Game;
+package Game.PowerUp;
 
-public class ExpandPaddlePowerUp extends PowerUp {
+import Game.Paddle;
+
+public class ExpandPaddlePowerUp extends PowerUp{
     private final int deltaWidth = 40;
     private boolean isActive = false;
     private int originalWidth; // lưu width gốc
@@ -15,10 +17,10 @@ public class ExpandPaddlePowerUp extends PowerUp {
         isActive = true;
 
         originalWidth = paddle.getWidth();
-        paddle.width = originalWidth + deltaWidth;
+        paddle.setWidth(originalWidth + deltaWidth);
 
-        if (paddle.x < 0) paddle.x = 0;
-        if (paddle.x + paddle.width > 800) paddle.x = 800 - paddle.width;
+        if (paddle.getX() < 0) paddle.setX(0);
+        if (paddle.getX() + paddle.getWidth() > 800) paddle.setX(800 - paddle.getWidth());
     }
 
     @Override
@@ -26,9 +28,9 @@ public class ExpandPaddlePowerUp extends PowerUp {
         if (!isActive) return;
         isActive = false;
 
-        paddle.width = originalWidth;
+        paddle.setWidth(originalWidth);
 
-        if (paddle.x < 0) paddle.x = 0;
-        if (paddle.x + paddle.width > 800) paddle.x = 800 - paddle.width;
+        if (paddle.getX() < 0) paddle.setX(0);
+        if (paddle.getX() + paddle.getWidth() > 800) paddle.setX(800 - paddle.getWidth());
     }
 }
