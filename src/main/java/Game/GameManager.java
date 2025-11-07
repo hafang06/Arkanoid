@@ -1,8 +1,10 @@
 package Game;
+
 import Game.Brick.Brick;
 import Game.Brick.unBreakBrick;
 import Game.Map.*;
 import Game.PowerUp.PowerUp;
+import Game.PowerUp.PowerUpManager;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -20,9 +22,14 @@ public class GameManager {
     public static final int screenWidth = 800;
     public static final int SW = 900;
     public static final int screenHeight = 600;
-    private Renderer renderer;
 
-    private List<GameObject> objects = new ArrayList<>();
+    private final GraphicsContext gc;
+    private final Renderer renderer;
+
+    private final List<GameObject> objects = new ArrayList<>();
+    private final List<Map> maps = new ArrayList<>();
+    private final List<Ball> extraBalls = new ArrayList<>(); // bóng phụ từ MultiBall
+
     private Paddle paddle;
     private Ball ball;
     private List<Brick> bricks = new ArrayList<>();
@@ -32,24 +39,29 @@ public class GameManager {
     private Image BackGround;
     private int currentLevel;
 
-    private List<Map> maps=new ArrayList<>();
+    //private List<Map> maps=new ArrayList<>();
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean spacePressed = false;
-    private boolean gameStarted = false;//check if game started or not
+    private boolean gameStarted = false;
 
-    //init renderer and paddle's position and size
+    private PowerUpManager powerUpManager;
+
     public GameManager(GraphicsContext gc) {
-        renderer = new Renderer(gc);
-        paddle = new Paddle(screenWidth / 2 - 50, screenHeight - 40, 100, 20, 4);
-        //ball = new Ball();
+        this.gc = gc;
+        this.renderer = new Renderer(gc);
+
+        // Paddle & Ball khởi tạo
+        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
+
         int ballSize = 15;
-        double ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
-        double ballY = paddle.getY() - ballSize - 2; // đặt ngay trên paddle, cách 2px
-
+        double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
+        double ballY = paddle.getY() - ballSize - 2;
         ball = new Ball(ballX, ballY, ballSize, 4);
+        paddle.setBall(ball);
 
+        // Map & bricks
         maps.add(new Map1());
         maps.add(new Map2());
         maps.add(new Map3());
@@ -75,46 +87,111 @@ public class GameManager {
         ball = new Ball(ballX, ballY, ballSize, 4);
 
         gameStarted = false; // chờ người chơi nhấn space để bắt đầu lại
+        bricks = maps.get(0).getBricks();
+
+        // PowerUpManager
+        powerUpManager = new PowerUpManager(screenHeight);
+
+        // (1) Bóng mới từ MultiBall sẽ thêm vào extraBalls
+        powerUpManager.setBallSink(extraBalls::add);
+
+        // (2) Cho Manager biết cách lấy TẤT CẢ bóng hiện có (ball chính + extraBalls)
+        powerUpManager.setBallsSupplier(() -> {
+            ArrayList<Ball> all = new ArrayList<>();
+            all.add(ball);          // bóng chính
+            all.addAll(extraBalls); // bóng phụ
+            return all;
+        });
+
+        // (3) Tuỳ chọn: chỉ định ảnh fire cho bóng (đổi được lúc runtime)
+        // Nếu Fireball đang chạy khi gọi, Manager sẽ cập nhật skin cho toàn bộ bóng ngay.
+        powerUpManager.setFireBallSkin("/Image/ballfire.png");
+
+        // (tuỳ chọn test)
+        // powerUpManager.setDropRates(0.50, 0.20, 0.20, 0.10); // Fast/Expand/Fire/Multi
+        // powerUpManager.setMaxPerTypePerLevel(3);            // mỗi loại tối đa 3 lần
     }
 
     //update all object every frame
     public void updateGame(double deltaTime) {
         handleInput();
-        if(!gameStarted){
+
+        if (!gameStarted) {
+            // Giữ bóng bám theo paddle trước khi bắn
             int ballSize = 15;
-            paddle.update(deltaTime,0,screenWidth);
-            double x = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;;
+            paddle.update(deltaTime, 0, screenWidth);
+            double x = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
             double y = paddle.getY() - ballSize - 2;
             ball = new Ball(x, y, ballSize, 4);
+            paddle.setBall(ball);
             return;
         }
-        for(Brick brick : bricks){
-            brick.update(deltaTime,0,screenWidth);
+
+        // Cập nhật sprite/ảnh gạch theo HP
+        for (Brick brick : bricks) {
+            brick.update(deltaTime, 0, screenWidth);
         }
 
-        //check if ball is touching any brick
-        int destroyedBrick = -1;
-        int index = 0;
-        for(Brick br : bricks){
-            if(ball.checkCollision(br)){
+        // === Bóng chính vs Gạch ===
+        for (java.util.ListIterator<Brick> it = bricks.listIterator(); it.hasNext();) {
+            Brick br = it.next();
+            if (!ball.checkCollision(br)) continue;
+
+            // Nếu Fireball bật xuyên: không bounce, chỉ gây damage
+            if (!ball.isPiercing()) {
                 ball.bounceOff(br);
-
-                //if ball touched the brick then brick -1 hp
-                    br.takeHit(ball);
-                    if(br.isDestroyed()){
-                        destroyedBrick = index;
-                    }
             }
-            index++;
-        }
-        if(destroyedBrick != -1) bricks.remove(destroyedBrick);
+            br.takeHit(ball);
 
-
-        for(GameObject obj : objects){
-            obj.update(deltaTime,0,screenWidth);
+            if (br.isDestroyed()) {
+                int cx = (int) (br.getX() + br.getWidth()  / 2.0);
+                int cy = (int) (br.getY() + br.getHeight() / 2.0);
+                powerUpManager.maybeDropAt(cx, cy);
+                it.remove();
+            }
         }
-        //check touching the paddle
-        if(ball.checkCollision(paddle)){
+
+        // === Mỗi bóng phụ vs Gạch + Paddle ===
+        for (int i = 0; i < extraBalls.size(); i++) {
+            Ball b = extraBalls.get(i);
+
+            for (java.util.ListIterator<Brick> it = bricks.listIterator(); it.hasNext();) {
+                Brick br = it.next();
+                if (!b.checkCollision(br)) continue;
+
+                if (!b.isPiercing()) {
+                    b.bounceOff(br);
+                }
+                br.takeHit(b);
+
+                if (br.isDestroyed()) {
+                    int cx = (int) (br.getX() + br.getWidth()  / 2.0);
+                    int cy = (int) (br.getY() + br.getHeight() / 2.0);
+                    powerUpManager.maybeDropAt(cx, cy);
+                    it.remove();
+                }
+            }
+
+            if (b.checkCollision(paddle)) {
+                b.bounceOff(paddle);
+            }
+
+            b.update(deltaTime, 0, screenWidth);
+
+            // rơi khỏi đáy -> loại bóng phụ
+            if (b.getY() > screenHeight) {
+                extraBalls.remove(i);
+                i--;
+            }
+        }
+
+        // Other objects
+        for (GameObject obj : objects) {
+            obj.update(deltaTime, 0, screenWidth);
+        }
+
+        // Bóng chính vs Paddle
+        if (ball.checkCollision(paddle)) {
             ball.bounceOff(paddle);
         }
 
@@ -131,6 +208,9 @@ public class GameManager {
             currentLevel++;
             loadCurrentMap();
         }
+
+        // PowerUp: rơi -> nhặt -> (nếu có thời gian) đếm lùi
+        powerUpManager.update(deltaTime, paddle);
     }
 
     //render all object every frame
@@ -143,12 +223,21 @@ public class GameManager {
             renderer.draw(brick);
         }
         renderer.draw(ball);
+        for (Ball b : extraBalls) {
+            renderer.draw(b);
+        }
+
+        // Vẽ paddle
         renderer.draw(paddle);
+
+        // Vẽ item power-up đang rơi
+        powerUpManager.render(gc);
     }
 
     //current movement
     public void handleInput() {
-        if(spacePressed) gameStarted = true;
+        if (spacePressed) gameStarted = true;
+
         if (leftPressed) {
             paddle.moveLeft();
         } else if (rightPressed) {
@@ -228,17 +317,18 @@ public class GameManager {
 
 
     public void onKeyPressed(KeyCode key) {
-        if (key == KeyCode.LEFT) leftPressed = true;
+        if (key == KeyCode.LEFT)  leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
         if(key == KeyCode.TAB) spacePressed = true;
         if (key == KeyCode.S) saveGame("save.json");
         if (key == KeyCode.L) loadGame("save.json");
+        if (key == KeyCode.SPACE) spacePressed = true; // SPACE để bắt đầu
     }
 
     public void onKeyReleased(KeyCode key) {
-        if (key == KeyCode.LEFT) leftPressed = false;
+        if (key == KeyCode.LEFT)  leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
-        if(key == KeyCode.SPACE) spacePressed = true;
+        if (key == KeyCode.SPACE) spacePressed = false; // nhả SPACE -> false
     }
 
     public void checkCollisions() {}

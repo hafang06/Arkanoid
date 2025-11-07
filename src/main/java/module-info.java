@@ -13,4 +13,6 @@ module Game {
     opens Game to com.google.gson, javafx.fxml;
 //    opens Game to javafx.fxml;
     exports Game;
+    exports Game.PowerUp;
+    opens Game.PowerUp to javafx.fxml;
 }

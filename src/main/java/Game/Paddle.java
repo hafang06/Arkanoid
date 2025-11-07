@@ -3,7 +3,6 @@ package Game;
 import Game.PowerUp.PowerUp;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class Paddle extends MovableObject {
     private int speed;
@@ -73,5 +72,12 @@ public class Paddle extends MovableObject {
         if (x < leftWall) x = leftWall;
         // Bổ sung sau khi có chiều rộng màn hình
         if (x + width > rightWall ) x = rightWall - width;
+    }
+
+    // MỚI/ Trong class Paddle (Game/Paddle.java)
+    public void clampToScreen() {
+        // Dùng screenWidth tĩnh của GameManager; nếu bạn có biến khác thì thay vào
+        if (x < 0) x = 0;
+        if (x + width > GameManager.screenWidth) x = GameManager.screenWidth - width;
     }
 }

@@ -1,57 +1,64 @@
 package Game;
-import Game.Brick.Brick;
 
+import Game.Brick.Brick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Ball extends MovableObject {
     private int speed;
-    private double  directionX, directionY;
+    private double directionX, directionY;
     private Image image;
+    private boolean piercing = false;
+
+    private static Image IMG_NORMAL;
+    private static Image IMG_FIRE;
+
+    static {
+        try {
+            IMG_NORMAL = new Image(Ball.class.getResourceAsStream("/Image/ball.png"));
+        } catch (Exception ignored) {}
+        try {
+            IMG_FIRE = new Image(Ball.class.getResourceAsStream("/Image/PowerUp/ballfire.png"));
+        } catch (Exception ignored) {}
+    }
 
     public Ball(double x, double y, int size, int speed) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
         this.directionX = 0.5;
         this.directionY = -1;
-        image = new Image(getClass().getResourceAsStream("/Image/ball.png"));
+        this.image = (IMG_NORMAL != null) ? IMG_NORMAL : null;
+
         double len = Math.sqrt(directionX * directionX + directionY * directionY);
         directionX /= len;
         directionY /= len;
 
     }
 
-    public int getSpeed() {
-        return speed;
-    }
+    public static void setGlobalNormalSkin(Image img) { if (img != null) IMG_NORMAL = img; }
+    public static void setGlobalFireSkin(Image img)   { if (img != null) IMG_FIRE   = img; }
 
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
+    public void setSkinNormal() { if (IMG_NORMAL != null) this.image = IMG_NORMAL; }
+    public void setSkinFire()   { if (IMG_FIRE   != null) this.image = IMG_FIRE;   }
 
-    public double getDirectionX() {
-        return directionX;
-    }
+    public int getSpeed() { return speed; }
+    public void setSpeed(int speed) { this.speed = speed; }
 
-    public void setDirectionX(double directionX) {
-        this.directionX = directionX;
-    }
+    public double getDirectionX() { return directionX; }
+    public void setDirectionX(double directionX) { this.directionX = directionX; }
 
-    public double getDirectionY() {
-        return directionY;
-    }
+    public double getDirectionY() { return directionY; }
+    public void setDirectionY(double directionY) { this.directionY = directionY; }
 
-    public void setDirectionY(double directionY) {
-        this.directionY = directionY;
-    }
+    public boolean isPiercing() { return piercing; }
+    public void setPiercing(boolean v) { this.piercing = v; }
 
     public void bounceOff(GameObject other) {
         if (other instanceof Paddle) {
             Paddle paddle = (Paddle) other;
-
             double paddleCenter = paddle.x + paddle.width / 2.0;
-            double ballCenter = this.x + this.width / 2.0;
+            double ballCenter   = this.x + this.width / 2.0;
 
             double relativeIntersect = (ballCenter - paddleCenter) / (paddle.width / 2.0);
             relativeIntersect = Math.max(-1.0, Math.min(1.0, relativeIntersect));
@@ -67,11 +74,25 @@ public class Ball extends MovableObject {
             directionY /= len;
 
             y = paddle.y - height - 1;
-
-
             return;
         }
         else if (other instanceof Brick) {
+            Brick brick = (Brick) other;
+
+            if (piercing) {
+                int hp = brick.getHitPoints();
+                if (hp <= 2) {
+                    brick.destroy(); // phá gạch hoàn toàn
+                    return; // xuyên qua, không đổi hướng
+                } else {
+                    brick.reduceHp(2); // trừ 2 HP
+                    // Sau đó bật lại như bình thường
+                }
+            } else {
+                brick.takeHit(this); // logic bình thường
+            }
+
+            // Xử lý bật lại
             double ballCenterX = x + width / 2.0;
             double ballCenterY = y + height / 2.0;
             double brickCenterX = other.x + other.width / 2.0;
@@ -86,11 +107,11 @@ public class Ball extends MovableObject {
             if (overlapX < overlapY) {
                 directionX *= -1;
                 if (dx > 0) x += overlapX + 0.1;
-                else x -= overlapX + 0.1;
+                else        x -= overlapX + 0.1;
             } else {
                 directionY *= -1;
                 if (dy > 0) y += overlapY + 0.1;
-                else y -= overlapY + 0.1;
+                else        y -= overlapY + 0.1;
             }
 
             return;
@@ -100,34 +121,27 @@ public class Ball extends MovableObject {
         }
     }
 
-
-    //Kiem tra va cham vs cac vat the khac
     public boolean checkCollision(GameObject other) {
-        //Lay tam qua bong
         double ballCenterX = x + width / 2.0;
         double ballCenterY = y + height / 2.0;
 
-        //Lay vi tri gan nhat cua doi tuong so sanh vs ball
         double nearestX = Math.max(other.x, Math.min(ballCenterX, other.x + other.width));
         double nearestY = Math.max(other.y, Math.min(ballCenterY, other.y + other.height));
 
         double dx = ballCenterX - nearestX;
         double dy = ballCenterY - nearestY;
 
-        //Kiem tra khoang cach neu co va cham thi khoang cach nho hon ban kinh
         return (dx * dx + dy * dy) < (width / 2.0) * (width / 2.0);
     }
 
     @Override
-    // Cap nhat vi tri sau moi frame
-    public void update(double deltaTime,int leftWall, int rightWall) {
+    public void update(double deltaTime, int leftWall, int rightWall) {
         move(leftWall, rightWall);
     }
 
     @Override
-    // ve hinh qua bong
     public void render(GraphicsContext gc) {
-        double scale = 1.5; // hoặc 3.0 nếu muốn to hơn
+        double scale = 1.5;
         double drawWidth = width * scale;
         double drawHeight = height * scale;
 
@@ -143,7 +157,6 @@ public class Ball extends MovableObject {
 
     @Override
     public void move(int leftWall, int rightWall) {
-        // Cập nhật vị trí theo hướng và tốc độ
         x += directionX * speed;
         y += directionY * speed;
 
@@ -151,9 +164,7 @@ public class Ball extends MovableObject {
             x = leftWall;
             directionX *= -1;
             x += directionX * speed;
-        }
-        //them sau khi co screen width
-        else if (x + width >= rightWall) {
+        } else if (x + width >= rightWall) {
             x = rightWall - width;
             directionX *= -1;
             x += directionX * speed;
@@ -164,6 +175,5 @@ public class Ball extends MovableObject {
             directionY *= -1;
             y += directionY * speed;
         }
-
     }
 }

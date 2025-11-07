@@ -2,19 +2,25 @@ package Game.PowerUp;
 
 import Game.Ball;
 import Game.Paddle;
+import javafx.scene.image.Image;
 
-public class FastBallPowerUp extends PowerUp{
-    private final int deltaSpeed = 4;
+public class FastBallPowerUp extends PowerUp {
+    private final int deltaSpeed = 1;
     private boolean isActive = false;
-    private int originalSpeed;        // lưu speed gốc
+    private int originalSpeed;
+
+    private static final Image IMG = new Image(
+            FastBallPowerUp.class.getResource("/Image/PowerUp/fastball.png").toExternalForm()
+    );
 
     public FastBallPowerUp(int x, int y) {
-        super(x, y, 20, 20, "FastBall", 10);
+        super(x, y, 24, 24, "FastBall", 10);
+        this.image = IMG;
     }
 
     @Override
     public void applyEffect(Paddle paddle) {
-        if (isActive) return;
+        if (isActive) return;              // đang chạy -> bỏ qua
         Ball ball = paddle.getBall();
         if (ball == null) return;
         isActive = true;
@@ -25,10 +31,10 @@ public class FastBallPowerUp extends PowerUp{
     @Override
     public void removeEffect(Paddle paddle) {
         if (!isActive) return;
-        Ball ball = paddle.getBall();
         isActive = false;
+        Ball ball = paddle.getBall();
         if (ball != null) {
-            ball.setSpeed(originalSpeed);
+            ball.setSpeed(originalSpeed); // trả về đúng giá trị trước khi áp
         }
     }
 }

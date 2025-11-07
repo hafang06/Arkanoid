@@ -13,6 +13,7 @@ public class Brick extends GameObject {
     protected Image image;
     private static final int DEFAULT_WIDTH = 48;
     private static final int DEFAULT_HEIGHT = 18;
+
     private static final Image Brick1 = new Image(Brick.class.getResource("/Image/violet.png").toExternalForm());
     private static final Image Brick2 = new Image(Brick.class.getResource("/Image/blue.png").toExternalForm());
     private static final Image Brick3 = new Image(Brick.class.getResource("/Image/green.png").toExternalForm());
@@ -28,9 +29,8 @@ public class Brick extends GameObject {
         this.hitPoints = hitPoints;
     }
 
-
     public Brick(double x, double y, int hitPoints) {
-        super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT );
+        super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.hitPoints = hitPoints;
     }
 
@@ -39,11 +39,23 @@ public class Brick extends GameObject {
             this.hitPoints--;
         }
     }
-    public boolean isDestroyed() { return hitPoints <= 0; }
 
+    public void reduceHp(int amount) {
+        if (!(this instanceof unBreakBrick)) {
+            this.hitPoints -= amount;
+        }
+    }
+
+    public void destroy() {
+        this.hitPoints = 0;
+    }
+
+    public boolean isDestroyed() {
+        return hitPoints <= 0;
+    }
 
     @Override
-    public void update(double deltaTime,int leftWall, int rightWall) {
+    public void update(double deltaTime, int leftWall, int rightWall) {
         setImageByHitPoints();
     }
 
@@ -69,12 +81,16 @@ public class Brick extends GameObject {
                 break;
         }
     }
-    public void render(GraphicsContext gc) {
 
+    public void render(GraphicsContext gc) {
         if (!isDestroyed()) {
             setImageByHitPoints();
-            gc.drawImage(image,x,y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
+            gc.drawImage(image, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         }
     }
 
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
 }
