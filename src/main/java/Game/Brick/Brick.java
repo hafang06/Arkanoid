@@ -11,8 +11,8 @@ import java.util.List;
 public class Brick extends GameObject {
     protected int hitPoints;
     protected Image image;
-    private static final int DEFAULT_WIDTH = 48;
-    private static final int DEFAULT_HEIGHT = 18;
+    private static final int DEFAULT_WIDTH = 50;
+    private static final int DEFAULT_HEIGHT = 20;
     private static final Image Brick1 = new Image(Brick.class.getResource("/Image/violet.png").toExternalForm());
     private static final Image Brick2 = new Image(Brick.class.getResource("/Image/blue.png").toExternalForm());
     private static final Image Brick3 = new Image(Brick.class.getResource("/Image/green.png").toExternalForm());
