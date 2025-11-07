@@ -18,6 +18,7 @@ import java.io.IOException;
 
 public class GameManager {
     public static final int screenWidth = 800;
+    public static final int SW = 900;
     public static final int screenHeight = 600;
     private Renderer renderer;
 
@@ -27,7 +28,7 @@ public class GameManager {
     private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score = 0;
-    private int lives = 3;
+    private int lives = 5;
     private Image BackGround;
     private int currentLevel;
 
