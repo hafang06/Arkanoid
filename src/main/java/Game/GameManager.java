@@ -5,6 +5,8 @@ import Game.Brick.unBreakBrick;
 import Game.Map.*;
 import Game.PowerUp.PowerUp;
 import Game.PowerUp.PowerUpManager;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -14,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
+import javafx.stage.Stage;
+
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,7 +41,7 @@ public class GameManager {
     private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score = 0;
-    private int lives = 5;
+    private int lives = 2;
     private Image BackGround;
     private int currentLevel;
 
@@ -45,13 +49,17 @@ public class GameManager {
     private boolean rightPressed = false;
     private boolean spacePressed = false;
     private boolean gameStarted = false;
+    private boolean isGameOver = false;
+
+    private Stage stage;
 
     private PowerUpManager powerUpManager;
 
-    public GameManager(GraphicsContext gc) {
+
+    public GameManager(GraphicsContext gc, Stage stage) {
         this.gc = gc;
         this.renderer = new Renderer(gc);
-
+        this.stage = stage;
         // Paddle khởi tạo
         paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
 
@@ -104,10 +112,16 @@ public class GameManager {
 
         // (3) Tuỳ chọn: chỉ định ảnh fire cho bóng (đổi được lúc runtime)
         powerUpManager.setFireBallSkin("/Image/ballfire.png");
+        if (currentLevel != 1) {
+            SoundManager.NextLevel();
+        }
+        SoundManager.stopMusic(SoundManager.MPlayer);
+        SoundManager.playGameMusic(true);
     }
 
     //update all object every frame
     public void updateGame(double deltaTime) {
+        if(isGameOver) return;
         handleInput();
 
         if (!gameStarted) {
@@ -193,10 +207,12 @@ public class GameManager {
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
+                SoundManager.lostLive();
                 // reset lại 1 bóng gắn paddle và không start
                 ensureSingleBallAttachedToPaddle();
                 gameStarted = false;
             } else {
+                isGameOver = true;
                 gameOver();
                 return;
             }
@@ -358,7 +374,17 @@ public class GameManager {
 
     public void checkCollisions() {}
     public void gameOver() {
+        SoundManager.GameOver();
         System.out.println("GAME OVER");
         // tuỳ bạn: reset level, show menu,...
+        if(stage != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/gameMenu.fxml"));
+                Scene menuScene = new Scene(loader.load());
+                stage.setScene(menuScene);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

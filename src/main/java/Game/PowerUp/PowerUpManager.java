@@ -3,6 +3,7 @@ package Game.PowerUp;
 import Game.Ball;
 import Game.GameManager;
 import Game.Paddle;
+import Game.SoundManager;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -283,6 +284,7 @@ public class PowerUpManager {
 
             // Nhặt -> áp hiệu ứng
             if (intersects(p, paddle)) {
+                SoundManager.PowerUpMusic();
                 if (p.isInstant()) {
                     // MultiBall: áp ngay, không vào active
                     p.applyEffect(paddle);

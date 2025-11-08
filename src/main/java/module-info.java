@@ -1,6 +1,7 @@
 module Game {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.media;
 
     requires com.google.gson;
     requires org.controlsfx.controls;
