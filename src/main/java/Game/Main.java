@@ -11,6 +11,7 @@ import javafx.animation.AnimationTimer;
 
 public class Main extends Application {
     private Stage mainStage;
+    //SoundManager soundManager = new SoundManager();
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -24,6 +25,7 @@ public class Main extends Application {
         mainStage.setTitle("Arkanoid Menu");
         mainStage.setScene(menuScene);
         mainStage.show();
+        SoundManager.playBackgroundMusic(true); // loop nhạc nền
 
         MenuController controller = loader.getController();
         controller.setMainApp(this);
@@ -35,8 +37,8 @@ public class Main extends Application {
         mainStage.setScene(guideScene);
         mainStage.setTitle("Arkanoid - Guide");
         mainStage.show();
+        SoundManager.playBackgroundMusic(true);
         MenuController controller = loader.getController();
-        // 🔹 Truyền lại Main để nó gọi showMenu() được
         controller.setMainApp(this);
     }
 
@@ -52,8 +54,10 @@ public class Main extends Application {
         Object gm;
         if (isTwoPlayer) {
             gm = new GameManager2Player(gc);
+            SoundManager.stopMusic(SoundManager.bgPlayer);
         } else {
-            gm = new GameManager(gc);
+            SoundManager.stopMusic(SoundManager.bgPlayer);
+            gm = new GameManager(gc,mainStage);
         }
 
         Scene gameScene = new Scene(new StackPane(canvas));
