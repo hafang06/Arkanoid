@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -28,18 +29,17 @@ public class GameManager {
 
     private final List<GameObject> objects = new ArrayList<>();
     private final List<Map> maps = new ArrayList<>();
-    private final List<Ball> extraBalls = new ArrayList<>(); // bóng phụ từ MultiBall
+
+    // => SỬ DỤNG 1 LIST DUY NHẤT CHO TẤT CẢ BÓNG
+    private final List<Ball> balls = new ArrayList<>();
 
     private Paddle paddle;
-    private Ball ball;
     private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score = 0;
     private int lives = 5;
     private Image BackGround;
     private int currentLevel;
-
-    //private List<Map> maps=new ArrayList<>();
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -52,14 +52,8 @@ public class GameManager {
         this.gc = gc;
         this.renderer = new Renderer(gc);
 
-        // Paddle & Ball khởi tạo
+        // Paddle khởi tạo
         paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
-
-        int ballSize = 15;
-        double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
-        double ballY = paddle.getY() - ballSize - 2;
-        ball = new Ball(ballX, ballY, ballSize, 4);
-        paddle.setBall(ball);
 
         // Map & bricks
         maps.add(new Map1());
@@ -72,44 +66,44 @@ public class GameManager {
         loadCurrentMap();
     }
 
+    private void ensureSingleBallAttachedToPaddle() {
+        // Dùng khi chưa start: chỉ giữ 1 bóng chính và nó dính theo paddle
+        balls.clear();
+        int ballSize = 15;
+        double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
+        double ballY = paddle.getY() - ballSize - 2;
+        Ball b = new Ball(ballX, ballY, ballSize, 4,false);
+        balls.add(b);
+        paddle.setBall(b);
+    }
+
     private void loadCurrentMap() {
-        Map currentMap = maps.get(currentLevel-1);
+        Map currentMap = maps.get(currentLevel - 1);
         bricks = currentMap.getBricks();
         BackGround = currentMap.getBackGround();
 
-        // Reset vị trí paddle & bóng
+        // Reset vị trí paddle
         paddle.setX(screenWidth / 2 - paddle.getWidth() / 2);
         paddle.setY(screenHeight - 40);
 
-        int ballSize = 15;
-        double ballX = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
-        double ballY = paddle.getY() - ballSize - 2;
-        ball = new Ball(ballX, ballY, ballSize, 4);
+        // Reset trạng thái game -> giữ 1 bóng dính paddle (chưa bắn)
+        gameStarted = false;
+        ensureSingleBallAttachedToPaddle();
 
-        gameStarted = false; // chờ người chơi nhấn space để bắt đầu lại
-        bricks = maps.get(0).getBricks();
-
-        // PowerUpManager
+        // Reset PowerUp trước khi tạo mới / hoặc khôi phục trạng thái
+        if (powerUpManager != null) {
+            powerUpManager.clearAll();
+        }
         powerUpManager = new PowerUpManager(screenHeight);
 
-        // (1) Bóng mới từ MultiBall sẽ thêm vào extraBalls
-        powerUpManager.setBallSink(extraBalls::add);
+        // (1) Bóng mới từ MultiBall sẽ thêm vào balls list
+        powerUpManager.setBallSink(balls::add);
 
-        // (2) Cho Manager biết cách lấy TẤT CẢ bóng hiện có (ball chính + extraBalls)
-        powerUpManager.setBallsSupplier(() -> {
-            ArrayList<Ball> all = new ArrayList<>();
-            all.add(ball);          // bóng chính
-            all.addAll(extraBalls); // bóng phụ
-            return all;
-        });
+        // (2) Cho Manager biết cách lấy TẤT CẢ bóng hiện có (toàn bộ balls)
+        powerUpManager.setBallsSupplier(() -> balls);
 
         // (3) Tuỳ chọn: chỉ định ảnh fire cho bóng (đổi được lúc runtime)
-        // Nếu Fireball đang chạy khi gọi, Manager sẽ cập nhật skin cho toàn bộ bóng ngay.
         powerUpManager.setFireBallSkin("/Image/ballfire.png");
-
-        // (tuỳ chọn test)
-        // powerUpManager.setDropRates(0.50, 0.20, 0.20, 0.10); // Fast/Expand/Fire/Multi
-        // powerUpManager.setMaxPerTypePerLevel(3);            // mỗi loại tối đa 3 lần
     }
 
     //update all object every frame
@@ -117,71 +111,70 @@ public class GameManager {
         handleInput();
 
         if (!gameStarted) {
-            // Giữ bóng bám theo paddle trước khi bắn
-            int ballSize = 15;
+            // Giữ bóng đầu tiên bám theo paddle trước khi bắn; đảm bảo chỉ 1 bóng lúc này
             paddle.update(deltaTime, 0, screenWidth);
-            double x = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
-            double y = paddle.getY() - ballSize - 2;
-            ball = new Ball(x, y, ballSize, 4);
-            paddle.setBall(ball);
+            Ball main = balls.isEmpty() ? null : balls.get(0);
+            if (main != null) {
+                int ballSize = main.getWidth();
+                double x = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
+                double y = paddle.getY() - ballSize - 2;
+                main.setX(x);
+                main.setY(y);
+                paddle.setBall(main);
+            } else {
+                ensureSingleBallAttachedToPaddle();
+            }
             return;
         }
 
         // Cập nhật sprite/ảnh gạch theo HP
-        for (Brick brick : bricks) {
-            brick.update(deltaTime, 0, screenWidth);
-        }
 
-        // === Bóng chính vs Gạch ===
-        for (java.util.ListIterator<Brick> it = bricks.listIterator(); it.hasNext();) {
-            Brick br = it.next();
-            if (!ball.checkCollision(br)) continue;
+        // === Bóng vs Gạch ===
+        // Duyệt qua tất cả bóng (sử dụng iterator để có thể xóa an toàn)
+        for (Iterator<Ball> bit = balls.iterator(); bit.hasNext();) {
+            Ball b = bit.next();
 
-            // Nếu Fireball bật xuyên: không bounce, chỉ gây damage
-            if (!ball.isPiercing()) {
-                ball.bounceOff(br);
-            }
-            br.takeHit(ball);
-
-            if (br.isDestroyed()) {
-                int cx = (int) (br.getX() + br.getWidth()  / 2.0);
-                int cy = (int) (br.getY() + br.getHeight() / 2.0);
-                powerUpManager.maybeDropAt(cx, cy);
-                it.remove();
-            }
-        }
-
-        // === Mỗi bóng phụ vs Gạch + Paddle ===
-        for (int i = 0; i < extraBalls.size(); i++) {
-            Ball b = extraBalls.get(i);
-
+            // Va chạm với bricks
             for (java.util.ListIterator<Brick> it = bricks.listIterator(); it.hasNext();) {
                 Brick br = it.next();
                 if (!b.checkCollision(br)) continue;
 
+                // Nếu Fireball bật xuyên: không bounce, chỉ gây damage
                 if (!b.isPiercing()) {
                     b.bounceOff(br);
+                    br.takeHit(b);
+                } else if (b.isPiercing()) {
+                    int hp = br.getHitPoints();
+                    if (hp <= 2) {
+                        br.destroy(); // phá gạch hoàn toàn
+                         // xuyên qua, không đổi hướng
+                    } else {
+                        b.bounceOff(br);
+                        br.reduceHp(2);
+                        // trừ 2 HP
+                        // Sau đó bật lại như bình thường
+                    }
                 }
-                br.takeHit(b);
 
                 if (br.isDestroyed()) {
-                    int cx = (int) (br.getX() + br.getWidth()  / 2.0);
+                    int cx = (int) (br.getX() + br.getWidth() / 2.0);
                     int cy = (int) (br.getY() + br.getHeight() / 2.0);
                     powerUpManager.maybeDropAt(cx, cy);
                     it.remove();
                 }
             }
 
+            // Va chạm với paddle
             if (b.checkCollision(paddle)) {
                 b.bounceOff(paddle);
             }
 
+            // Cập nhật vị trí bóng
             b.update(deltaTime, 0, screenWidth);
 
-            // rơi khỏi đáy -> loại bóng phụ
+            // Nếu bóng rơi khỏi đáy -> remove
             if (b.getY() > screenHeight) {
-                extraBalls.remove(i);
-                i--;
+                bit.remove();
             }
         }
 
@@ -190,23 +183,35 @@ public class GameManager {
             obj.update(deltaTime, 0, screenWidth);
         }
 
-        // Bóng chính vs Paddle
-        if (ball.checkCollision(paddle)) {
-            ball.bounceOff(paddle);
+        paddle.update(deltaTime, 0, screenWidth);
+        for (Brick brick : bricks) {
+            brick.update(deltaTime, 0, screenWidth);
         }
 
-        ball.update(deltaTime,0,screenWidth);
-        paddle.update(deltaTime,0,screenWidth);
+
+        // Nếu không còn bóng => mất một mạng (hoặc gameover tuỳ logic)
+        if (balls.isEmpty()) {
+            lives--;
+            if (lives > 0) {
+                // reset lại 1 bóng gắn paddle và không start
+                ensureSingleBallAttachedToPaddle();
+                gameStarted = false;
+            } else {
+                gameOver();
+                return;
+            }
+        }
 
         boolean check = true;
-        for(Brick br : bricks){
-            if(!(br instanceof unBreakBrick)){
+        for (Brick br : bricks) {
+            if (!(br instanceof unBreakBrick)) {
                 check = false;
             }
         }
         if (check) {
             currentLevel++;
             loadCurrentMap();
+            return;
         }
 
         // PowerUp: rơi -> nhặt -> (nếu có thời gian) đếm lùi
@@ -222,8 +227,9 @@ public class GameManager {
         for (Brick brick : bricks) {
             renderer.draw(brick);
         }
-        renderer.draw(ball);
-        for (Ball b : extraBalls) {
+
+        // Vẽ tất cả bóng
+        for (Ball b : balls) {
             renderer.draw(b);
         }
 
@@ -236,7 +242,18 @@ public class GameManager {
 
     //current movement
     public void handleInput() {
-        if (spacePressed) gameStarted = true;
+        if (spacePressed) {
+            // Space: bắn bóng nếu chưa bắn, hoặc nhảy qua nếu đã bắn
+            if (!gameStarted) {
+                gameStarted = true;
+                // nếu chỉ có 1 bóng thì cho nó bật lên 1 lần (giữ hướng mặc định)
+                if (!balls.isEmpty()) {
+                    Ball main = balls.get(0);
+                    // nếu muốn set velocity mặc định khi bắn, có thể set ở đây
+                    // ví dụ main.setDirectionX(0.2); main.setDirectionY(-0.8);
+                }
+            }
+        }
 
         if (leftPressed) {
             paddle.moveLeft();
@@ -250,13 +267,17 @@ public class GameManager {
     //Save game
     public void saveGame(String fileName){
         GameState curState = new GameState();
-        //save ball state
-        curState.setBallX(ball.getX());
-        curState.setBallY(ball.getY());
-        curState.setBallDirectionX(ball.getDirectionX());
-        curState.setBallDirectionY(ball.getDirectionY());
-        curState.setBallDX(ball.getDx());
-        curState.setBallDY(ball.getDy());
+
+        // Lưu trạng thái ball: nếu có nhiều bóng, lưu trạng thái của quả đầu (đơn giản)
+        if (!balls.isEmpty()) {
+            Ball b = balls.get(0);
+            curState.setBallX(b.getX());
+            curState.setBallY(b.getY());
+            curState.setBallDirectionX(b.getDirectionX());
+            curState.setBallDirectionY(b.getDirectionY());
+            curState.setBallDX(b.getDx());
+            curState.setBallDY(b.getDy());
+        }
 
         //save paddle state
         curState.setPaddleX(paddle.getX());
@@ -289,13 +310,17 @@ public class GameManager {
             Gson gson = new Gson();
             GameState state = gson.fromJson(reader, GameState.class);
 
-            //load ball
-            ball.setX(state.getBallX());
-            ball.setY(state.getBallY());
-            ball.setDx(state.getBallDX());
-            ball.setDy(state.getBallDY());
-            ball.setDirectionX(state.getBallDirectionX());
-            ball.setDirectionY(state.getBallDirectionY());
+            //load ball (đặt lại 1 bóng chính theo file)
+            ensureSingleBallAttachedToPaddle();
+            if (!balls.isEmpty()) {
+                Ball b = balls.get(0);
+                b.setX(state.getBallX());
+                b.setY(state.getBallY());
+                b.setDx(state.getBallDX());
+                b.setDy(state.getBallDY());
+                b.setDirectionX(state.getBallDirectionX());
+                b.setDirectionY(state.getBallDirectionY());
+            }
 
             //load paddle
             paddle.setX(state.getPaddleX());
@@ -332,5 +357,8 @@ public class GameManager {
     }
 
     public void checkCollisions() {}
-    public void gameOver() {}
+    public void gameOver() {
+        System.out.println("GAME OVER");
+        // tuỳ bạn: reset level, show menu,...
+    }
 }
