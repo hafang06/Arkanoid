@@ -58,8 +58,8 @@ public class GameManager2Player {
         double ballX2 = paddle2.getX() + paddle2.getWidth() / 2 - ballSize / 2;
         double ballY2 = paddle2.getY() - ballSize - 2;
 
-        ball1 = new Ball(ballX1, ballY1, ballSize, 4);
-        ball2 = new Ball(ballX2, ballY2, ballSize, 4);
+        ball1 = new Ball(ballX1, ballY1, ballSize, 4, false);
+        ball2 = new Ball(ballX2, ballY2, ballSize, 4,false);
     }
 
     private void addBrickPair() {

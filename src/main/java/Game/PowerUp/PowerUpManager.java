@@ -20,10 +20,12 @@ import java.util.function.Supplier;
  *  - Ball sink/balls supplier để thêm bóng và lấy danh sách bóng hiện có.
  */
 public class PowerUpManager {
-    private double FASTBALL_DROP_RATE  = 0.0;
-    private double EXPAND_DROP_RATE    = 0.0;
-    private double FIREBALL_DROP_RATE  = 0.50;
-    private double MULTI_DROP_RATE     = 0.50;
+    private static final double GLOBAL_DROP_RATE = 0.2; // 20% tổng xác suất rơi
+
+    private double FASTBALL_DROP_RATE  = 0.1 * GLOBAL_DROP_RATE;
+    private double EXPAND_DROP_RATE    = 0.1 * GLOBAL_DROP_RATE;
+    private double FIREBALL_DROP_RATE  = 0.4 * GLOBAL_DROP_RATE;
+    private double MULTI_DROP_RATE     = 0.4 * GLOBAL_DROP_RATE;
 
     private int MAX_PER_TYPE_PER_LEVEL = 2;
     private final Map<String, Integer> perTypeSpawned = new HashMap<>();
@@ -129,8 +131,13 @@ public class PowerUpManager {
         List<Ball> all = ballsSupplier.get();
         if (all == null) return;
         for (Ball b : all) {
-            if (on) b.setSkinFire();
-            else    b.setSkinNormal();
+            if (on) {
+                b.setSkinFire();
+                b.setPiercing(true);  // quan trọng: cho tất cả bóng
+            } else {
+                b.setSkinNormal();
+                b.setPiercing(false); // hết hiệu ứng
+            }
         }
     }
 
@@ -152,31 +159,28 @@ public class PowerUpManager {
     public void replicateAllBalls(double angleRad) {
         if (ballsSupplier == null || ballSink == null) return;
 
-        List<Ball> currents = ballsSupplier.get();
-        if (currents == null || currents.isEmpty()) return;
+        List<Ball> currents = new ArrayList<>(ballsSupplier.get()); // copy để tránh lặp trên list đang thay đổi
+        if (currents.isEmpty()) return;
 
         double sin = Math.sin(angleRad), cos = Math.cos(angleRad);
-
         boolean fireballActive = isFireballActive();
 
         for (Ball src : currents) {
-            int size = 15;                // kích thước bóng chuẩn của game
+            int size = 15;
             int speed = src.getSpeed();
             double bx = src.getX(), by = src.getY();
             double dx = src.getDirectionX(), dy = src.getDirectionY();
 
-            // rotate +angle
             double dx1 = dx * cos - dy * sin;
             double dy1 = dx * sin + dy * cos;
-            // rotate -angle
             double dx2 = dx * cos + dy * sin;
             double dy2 = -dx * sin + dy * cos;
 
-            Ball b1 = new Ball(bx, by, size, speed);
+            Ball b1 = new Ball(bx, by, size, speed,false);
             b1.setDirectionX(dx1);
             b1.setDirectionY(dy1);
 
-            Ball b2 = new Ball(bx, by, size, speed);
+            Ball b2 = new Ball(bx, by, size, speed,false);
             b2.setDirectionX(dx2);
             b2.setDirectionY(dy2);
 
@@ -189,10 +193,8 @@ public class PowerUpManager {
 
             addBalls(b1, b2);
         }
-
-        System.out.printf("[PU MULTI] Replicated all balls by ±%.0f°; added %d new balls%n",
-                Math.toDegrees(angleRad), currents.size() * 2);
     }
+
 
     /** Reset khi bắt đầu/đổi màn. */
     public void resetLevel() {
@@ -244,12 +246,12 @@ public class PowerUpManager {
         }
 
         // Fallback nếu loại được chọn đã đạt cap
-        if (toSpawn == null) {
-            if (canSpawnType("FastBall"))           toSpawn = new FastBallPowerUp(spawnX, spawnY);
-            else if (canSpawnType("ExpandPaddle"))  toSpawn = new ExpandPaddlePowerUp(spawnX, spawnY);
-            else if (canSpawnType("Fireball"))      toSpawn = new FireballPowerUp(spawnX, spawnY);
-            else if (canSpawnType("MultiBall"))     toSpawn = new MultiBallPowerUp(spawnX, spawnY, this);
-        }
+//        if (toSpawn == null) {
+//            if (canSpawnType("FastBall"))           toSpawn = new FastBallPowerUp(spawnX, spawnY);
+//            else if (canSpawnType("ExpandPaddle"))  toSpawn = new ExpandPaddlePowerUp(spawnX, spawnY);
+//            else if (canSpawnType("Fireball"))      toSpawn = new FireballPowerUp(spawnX, spawnY);
+//            else if (canSpawnType("MultiBall"))     toSpawn = new MultiBallPowerUp(spawnX, spawnY, this);
+//        }
 
         if (toSpawn != null) {
             items.add(toSpawn);
@@ -329,6 +331,15 @@ public class PowerUpManager {
                 // Nếu là Fireball -> trả skin Normal cho TẤT CẢ bóng
                 if ("Fireball".equals(ae.instance.getType())) {
                     setAllBallsFireSkin(false);
+                    // 🔥 Tắt xuyên gạch cho tất cả bóng hiện có
+                    if (ballsSupplier != null) {
+                        List<Ball> allBalls = ballsSupplier.get();
+                        if (allBalls != null) {
+                            for (Ball b : allBalls) {
+                                b.setPiercing(false);
+                            }
+                        }
+                    }
                 }
 
                 ai.remove();
@@ -368,6 +379,14 @@ public class PowerUpManager {
         this.EXPAND_DROP_RATE    = expandRate;
         this.FIREBALL_DROP_RATE  = fireballRate;
         this.MULTI_DROP_RATE     = multiRate;
+    }
+
+    public void clearAll() {
+        items.clear();     // xoá toàn bộ item đang rơi
+        active.clear();    // xoá toàn bộ hiệu ứng đang chạy
+        perTypeSpawned.clear(); // reset giới hạn số lần spawn
+        spawnedThisLevel = 0;   // reset bộ đếm
+        System.out.println("[PU] Cleared all PowerUps for new map");
     }
 
     /** Thiết lập giới hạn mỗi loại tối đa n lần trong một màn (mặc định 3). */

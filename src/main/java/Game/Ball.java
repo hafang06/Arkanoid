@@ -9,7 +9,7 @@ public class Ball extends MovableObject {
     private int speed;
     private double directionX, directionY;
     private Image image;
-    private boolean piercing = false;
+    private boolean piercing;
 
     private static Image IMG_NORMAL;
     private static Image IMG_FIRE;
@@ -23,11 +23,12 @@ public class Ball extends MovableObject {
         } catch (Exception ignored) {}
     }
 
-    public Ball(double x, double y, int size, int speed) {
+    public Ball(double x, double y, int size, int speed, boolean piercing) {
         super(x, y, size, size, 0, 0);
         this.speed = speed;
         this.directionX = 0.5;
         this.directionY = -1;
+        this.piercing = false;
         this.image = (IMG_NORMAL != null) ? IMG_NORMAL : null;
 
         double len = Math.sqrt(directionX * directionX + directionY * directionY);
@@ -79,18 +80,7 @@ public class Ball extends MovableObject {
         else if (other instanceof Brick) {
             Brick brick = (Brick) other;
 
-            if (piercing) {
-                int hp = brick.getHitPoints();
-                if (hp <= 2) {
-                    brick.destroy(); // phá gạch hoàn toàn
-                    return; // xuyên qua, không đổi hướng
-                } else {
-                    brick.reduceHp(2); // trừ 2 HP
-                    // Sau đó bật lại như bình thường
-                }
-            } else {
-                brick.takeHit(this); // logic bình thường
-            }
+//
 
             // Xử lý bật lại
             double ballCenterX = x + width / 2.0;
