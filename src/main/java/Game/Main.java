@@ -29,6 +29,17 @@ public class Main extends Application {
         controller.setMainApp(this);
     }
 
+    public void showGuide() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/Guide.fxml"));
+        Scene guideScene = new Scene(loader.load());
+        mainStage.setScene(guideScene);
+        mainStage.setTitle("Arkanoid - Guide");
+        mainStage.show();
+        MenuController controller = loader.getController();
+        // 🔹 Truyền lại Main để nó gọi showMenu() được
+        controller.setMainApp(this);
+    }
+
     public void startGame(boolean isTwoPlayer) {
         double width = 800;
         double height = 600;

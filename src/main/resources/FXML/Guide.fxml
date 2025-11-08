@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Game.MenuController">
+    <ImageView fx:id="background" fitHeight="600" fitWidth="800" preserveRatio="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <image>
+            <Image url="@../Image/anhnenGuide.png" />
+        </image>
+    </ImageView>
+   <Text fontSmoothingType="LCD" layoutX="303.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Guide" textAlignment="CENTER" wrappingWidth="154.8033905029297">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="40.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="0.6876971608832807" endY="0.7413249309130647" startX="0.6529968702454672">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.2443999946117401" green="0.4149911105632782" blue="0.9399999976158142" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="288.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" text="1 PLAYER" wrappingWidth="185.47002792358398">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="30.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="0.12933756650810369" endY="1.0" startX="0.25236593022331455">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.0782434493303299" green="0.300700306892395" blue="0.7456140518188477" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="88.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sử dụng các nút ← → trên bàn phím để điều khiển paddle " wrappingWidth="585.4700393676758">
+      <font>
+         <Font name="Times New Roman" size="20.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="1.0" blue="0.8981481194496155" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="87.0" layoutY="163.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bấm phím space  khi bắt đầu để bắn bóng lên" wrappingWidth="465.4700126647949">
+      <font>
+         <Font name="Times New Roman" size="20.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="1.0" blue="0.8981481194496155" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="296.0" layoutY="195.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2 PLAYER" wrappingWidth="185.47002792358398">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="30.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.0782434493303299" green="0.300700306892395" blue="0.7456140518188477" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="87.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 1 : các nút A D trên bàn phím để điều khiển paddle, bấm W để bắn bóng " wrappingWidth="585.4700393676758">
+      <font>
+         <Font name="Times New Roman" size="20.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="1.0" blue="0.8981481194496155" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="88.0" layoutY="295.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player 2 : các nút ← → trên bàn phím để điều khiển paddle, bấm ↑ để bắn bóng " wrappingWidth="585.4700393676758">
+      <font>
+         <Font name="Times New Roman" size="20.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="1.0" blue="0.8981481194496155" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="231.0" layoutY="350.0" strokeType="OUTSIDE" strokeWidth="0.0" text="TIPS AND TRICKS" wrappingWidth="315.4700736999512">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="30.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.0782434493303299" green="0.300700306892395" blue="0.7456140518188477" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="87.0" layoutY="403.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Khi bóng chạm vào paddle, vị trí chạm quyết định hướng bóng. Chạm giữa → bóng bay thẳng lên, chạm mép trái → bóng bay chéo trái, chạm mép phải → bay chéo phải. Nhớ di chuyển paddle tinh tế để điều khiển hướng bóng, bắn trúng các viên gạch khó." wrappingWidth="585.4700393676758">
+      <font>
+         <Font name="Times New Roman" size="20.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="1.0" blue="0.8981481194496155" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+   <Text layoutX="258.0" layoutY="504.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GOOD LUCK!" wrappingWidth="214.80340194702148">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="30.0" />
+      </font>
+      <fill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.0782434493303299" green="0.300700306892395" blue="0.7456140518188477" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="1.0" green="1.0" blue="1.0" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </fill>
+   </Text>
+    <Button fx:id="BackButton" layoutX="43.0" layoutY="535.0" mnemonicParsing="false" onAction="#BackClick"  prefHeight="37.0" prefWidth="141.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="BACK" textFill="#1c3078">
+        <font>
+            <Font name="Berlin Sans FB Bold" size="17.0" />
+        </font>
+    </Button>
+</AnchorPane>
