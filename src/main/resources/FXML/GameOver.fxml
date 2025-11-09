@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Game.MenuController">
+    <ImageView fx:id="background" fitHeight="600" fitWidth="800" preserveRatio="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <image>
+            <Image url="@../Image/GameOver.png" />
+        </image>
+    </ImageView>
+   <Label fx:id ="scoreLabel"  layoutX="317.0" layoutY="459.0" prefHeight="38.0" prefWidth="218.0" text="Scorce : 0">
+      <font>
+         <Font name="Bernard MT Condensed" size="30.0" />
+      </font>
+      <textFill>
+         <LinearGradient endX="1.0" endY="1.0" startX="0.31545742518894304" startY="0.02208204299493543">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="1.0" green="0.3024691343307495" blue="0.3024691343307495" />
+                  </color>
+               </Stop>
+               <Stop offset="0.12527964205816555">
+                  <color>
+                     <Color red="0.9649122953414917" green="0.9319047331809998" blue="0.9083279371261597" />
+                  </color>
+               </Stop>
+               <Stop offset="0.3333333333333333">
+                  <color>
+                     <Color red="0.9473684430122375" green="0.9438596367835999" blue="0.9385964870452881" />
+                  </color>
+               </Stop>
+               <Stop offset="0.5308970371582911">
+                  <color>
+                     <Color red="0.8141108751296997" green="0.8226897120475769" blue="0.8508771657943726" />
+                  </color>
+               </Stop>
+               <Stop offset="0.8008948545861296">
+                  <color>
+                     <Color red="0.8706519603729248" green="0.8859649300575256" blue="0.8640892505645752" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="0.8706519603729248" green="0.8859649300575256" blue="0.8640892505645752" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </textFill>
+   </Label>
+    <Button fx:id="GOQuitButton" layoutX="592.0" layoutY="538.0" mnemonicParsing="false" onAction= "#GOQuitClick" prefHeight="20.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="QUIT" textFill="#1c3078">
+        <font>
+            <Font name="Berlin Sans FB Bold" size="18.0" />
+        </font>
+    </Button>
+   <Button fx:id="GOMenuButton1" layoutX="116.0" layoutY="538.0" mnemonicParsing="false" onAction="#BackClick" prefHeight="20.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="MENU" textFill="#1c3078">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="18.0" />
+      </font>
+   </Button>
+
+</AnchorPane>

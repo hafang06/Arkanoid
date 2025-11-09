@@ -8,6 +8,7 @@ import Game.PowerUp.PowerUpManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
@@ -16,6 +17,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.FileWriter;
@@ -41,9 +48,10 @@ public class GameManager {
     private List<Brick> bricks = new ArrayList<>();
     private List<PowerUp> powerUps;
     private int score = 0;
-    private int lives = 2;
+    private int lives = 5;
     private Image BackGround;
     private int currentLevel;
+    private Image imageLife = new Image(getClass().getResourceAsStream("/Image/Life.png"));;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -52,14 +60,16 @@ public class GameManager {
     private boolean isGameOver = false;
 
     private Stage stage;
+    private Main mainApp;
 
     private PowerUpManager powerUpManager;
 
 
-    public GameManager(GraphicsContext gc, Stage stage) {
+    public GameManager(GraphicsContext gc, Stage stage, Main mainApp) {
         this.gc = gc;
         this.renderer = new Renderer(gc);
         this.stage = stage;
+        this.mainApp = mainApp;
         // Paddle khởi tạo
         paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
 
@@ -123,7 +133,6 @@ public class GameManager {
     public void updateGame(double deltaTime) {
         if(isGameOver) return;
         handleInput();
-
         if (!gameStarted) {
             // Giữ bóng đầu tiên bám theo paddle trước khi bắn; đảm bảo chỉ 1 bóng lúc này
             paddle.update(deltaTime, 0, screenWidth);
@@ -173,6 +182,7 @@ public class GameManager {
                 if (br.isDestroyed()) {
                     int cx = (int) (br.getX() + br.getWidth() / 2.0);
                     int cy = (int) (br.getY() + br.getHeight() / 2.0);
+                    this.score += 10;
                     powerUpManager.maybeDropAt(cx, cy);
                     it.remove();
                 }
@@ -239,6 +249,32 @@ public class GameManager {
         renderer.clear(screenWidth, screenHeight);
         if (BackGround != null) {
             renderer.drawBackground(BackGround, screenWidth, screenHeight);
+        }
+        GraphicsContext gc = renderer.getGc();
+
+        LinearGradient silverGradient = new LinearGradient(
+                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#f5f5f5")),
+                new Stop(0.25, Color.web("#c0c0c0")),
+                new Stop(0.5, Color.web("#8c8c8c")),
+                new Stop(0.75, Color.web("#dcdcdc")),
+                new Stop(1, Color.web("#f5f5f5"))
+        );
+
+        DropShadow glow = new DropShadow();
+        glow.setColor(Color.BLACK);
+        glow.setRadius(18);
+        glow.setSpread(0.5);
+
+        gc.setFont(Font.font("Arial Black", FontWeight.EXTRA_BOLD, 20));
+        gc.setFill(silverGradient);
+        gc.setLineWidth(2);
+        gc.fillText("Score: " + score, 600, 30);
+        gc.fillText("Lives: ", 30, 30);
+        int start1 = 115;
+        for (int i = 1; i <= lives; i++) {
+            renderer.getGc().drawImage(imageLife, start1, 15, 20, 20);
+            start1 += 25;
         }
         for (Brick brick : bricks) {
             renderer.draw(brick);
@@ -374,13 +410,18 @@ public class GameManager {
 
     public void checkCollisions() {}
     public void gameOver() {
+        SoundManager.stopMusic(SoundManager.MPlayer);
         SoundManager.GameOver();
         System.out.println("GAME OVER");
+        SoundManager.playBackgroundMusic(true);
         // tuỳ bạn: reset level, show menu,...
         if(stage != null) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/gameMenu.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/GameOver.fxml"));
                 Scene menuScene = new Scene(loader.load());
+                MenuController ct = loader.getController();
+                ct.setScore(this.score);
+                ct.setMainApp(this.mainApp);
                 stage.setScene(menuScene);
             } catch (IOException e) {
                 e.printStackTrace();

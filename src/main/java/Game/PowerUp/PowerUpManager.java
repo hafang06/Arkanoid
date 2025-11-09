@@ -397,4 +397,21 @@ public class PowerUpManager {
     }
 
     public void setRefreshDurationOnSameType(boolean v) { this.refreshDurationOnSameType = v; }
+    public void spawnPowerUp(int x, int y) {
+        PowerUp newpw;
+        int r = (int)(Math.random() * (8  + 1)) ;
+        if (r < 2) {
+            newpw = new ExpandPaddlePowerUp(x,y);
+        } else if (r < 4) {
+            newpw = new FastBallPowerUp(x,y);
+        } else if (r < 6) {
+            newpw = new FireballPowerUp(x,y);
+         } else {
+            newpw = new MultiBallPowerUp(x,y, this);
+        }
+        items.add(newpw);
+    }
+
+
+
 }

@@ -10,6 +10,7 @@ module Game {
     requires com.almasb.fxgl.all;
     requires javafx.graphics;
     //requires Game;
+    //requires Game;
 
     opens Game to com.google.gson, javafx.fxml;
 //    opens Game to javafx.fxml;
