@@ -1,6 +1,9 @@
 package Game;
 
 import Game.Brick.Brick;
+import Game.PowerUp.PowerUpManager;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
@@ -12,15 +15,19 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 public class GameManager2Player {
     public static final int screenWidth = 800;
     public static final int screenHeight = 600;
-
+    private Stage stage;
+    private Main mainApp;
     private Renderer renderer;
     private Paddle paddle1, paddle2;
     private Ball ball1, ball2;
@@ -37,17 +44,27 @@ public class GameManager2Player {
     private Random rand = new Random();
 
     private long lastBrickTime = 0;
-    private final long brickInterval = 5_000_000_000L;
+    private final long brickInterval = 8_000_000_000L;
 
     private int lives1 = 5;
     private int lives2 = 5;
     private int score1 = 0;
     private int score2 = 0;
+    private int winScores;
+    private int winPlayer;
+
+    private PowerUpManager powerUpManager1;
+    private PowerUpManager powerUpManager2;
+    private List<Ball> balls1;
+    private List<Ball> balls2;
+    private boolean isGameOver = false;
 
     int uiHeight = 80;
     Canvas canvas = new Canvas(screenWidth, screenHeight + uiHeight);
 
-    public GameManager2Player(GraphicsContext gc) {
+    public GameManager2Player(GraphicsContext gc, Stage stage, Main mainApp) {
+        this.stage = stage;
+        this.mainApp = mainApp;
         renderer = new Renderer(gc);
         paddle1 = new Paddle(screenWidth / 4 - 50, screenHeight - 100, 100, 20, 4);
         paddle2 = new Paddle((3 * screenWidth) / 4 - 50, screenHeight - 100, 100, 20, 4);
@@ -58,8 +75,34 @@ public class GameManager2Player {
         double ballX2 = paddle2.getX() + paddle2.getWidth() / 2 - ballSize / 2;
         double ballY2 = paddle2.getY() - ballSize - 2;
 
+        // tạo 2 quả bóng chính ban đầu
         ball1 = new Ball(ballX1, ballY1, ballSize, 4, false);
-        ball2 = new Ball(ballX2, ballY2, ballSize, 4,false);
+        ball2 = new Ball(ballX2, ballY2, ballSize, 4, false);
+
+        // tạo danh sách quản lý các bóng cho từng player (dùng bởi PowerUpManager)
+        balls1 = new ArrayList<>();
+        balls2 = new ArrayList<>();
+        balls1.add(ball1);
+        balls2.add(ball2);
+
+        // khởi tạo PowerUpManager cho từng player
+        if (powerUpManager1 != null) {
+            powerUpManager1.clearAll();
+        }
+        powerUpManager1 = new PowerUpManager(screenHeight);
+        powerUpManager1.setBallSink(balls1::add);
+        powerUpManager1.setBallsSupplier(() -> balls1);
+        powerUpManager1.setFireBallSkin("/Image/ballfire.png");
+
+        if (powerUpManager2 != null) {
+            powerUpManager2.clearAll();
+        }
+        powerUpManager2 = new PowerUpManager(screenHeight);
+        powerUpManager2.setBallSink(balls2::add);
+        powerUpManager2.setBallsSupplier(() -> balls2);
+        powerUpManager2.setFireBallSkin("/Image/ballfire.png");
+
+        SoundManager.playGameMusic(true);
     }
 
     private void addBrickPair() {
@@ -120,9 +163,9 @@ public class GameManager2Player {
     }
 
     public void updateGame(double deltaTime) {
+        if (isGameOver) return;
         handleInput();
-        if (!gameReady)
-        {
+        if (!gameReady) {
             return;
         }
         long now = System.nanoTime();
@@ -131,7 +174,7 @@ public class GameManager2Player {
             lastBrickTime = now;
         }
 
-        int fallSpeed = 10;
+        int fallSpeed = 5;
         boolean brickBelowPaddle1 = false;
         boolean brickBelowPaddle2 = false;
 
@@ -153,56 +196,175 @@ public class GameManager2Player {
         if (brickBelowPaddle1) {
             brick1.clear();
             lives1--;
+            if(lives1 != 0) {
+                SoundManager.lostLive();
+            }
+            // reset powerups của player1 nếu muốn:
+            powerUpManager1.clearAll();
         }
         if (brickBelowPaddle2) {
             brick2.clear();
             lives2--;
+            if (lives2 != 0) {
+                SoundManager.lostLive();
+            }
+            powerUpManager2.clearAll();
         }
 
-        // --- PLAYER 1 ---
+        // --- PLAYER 1: cập nhật tất cả bóng thuộc balls1 ---
         if (!gameStarted1) {
-            paddle1.update(deltaTime, 0, screenWidth / 2);
-            int ballSize = 15;
-            double x1 = paddle1.getX() + paddle1.getWidth() / 2 - ballSize / 2;
-            double y1 = paddle1.getY() - ballSize - 2;
-            ball1.setX(x1);
-            ball1.setY(y1);
+            // nếu chưa bắt đầu, giữ tất cả bóng dính paddle
+            for (Ball b : balls1) {
+                paddle1.update(deltaTime, 0, screenWidth / 2);
+                int ballSize = b.getWidth();
+                double x1 = paddle1.getX() + paddle1.getWidth() / 2 - ballSize / 2;
+                double y1 = paddle1.getY() - ballSize - 2;
+                b.setX(x1);
+                b.setY(y1);
+            }
         } else {
-            ball1.update(deltaTime, 0, screenWidth / 2);
+            // cập nhật từng bóng
+            Iterator<Ball> it1 = balls1.iterator();
+            while (it1.hasNext()) {
+                Ball b = it1.next();
+                b.update(deltaTime, 0, screenWidth / 2);
+                // va chạm với paddle
+                if (b.checkCollision(paddle1)) b.bounceOff(paddle1);
+                // kiểm tra va chạm với brick (riêng cho player1)
+                checkBricksForBall(b, brick1, true);
+                // nếu rơi khỏi màn hình => remove
+                if (b.getY() > screenHeight) {
+                    it1.remove();
+                }
+            }
         }
 
-        // --- PLAYER 2 ---
+        // --- PLAYER 2: cập nhật tất cả bóng thuộc balls2 ---
         if (!gameStarted2) {
-            paddle2.update(deltaTime, screenWidth / 2 + 3, screenWidth);
-            int ballSize = 15;
-            double x2 = paddle2.getX() + paddle2.getWidth() / 2 - ballSize / 2;
-            double y2 = paddle2.getY() - ballSize - 2;
-            ball2.setX(x2);
-            ball2.setY(y2);
+            for (Ball b : balls2) {
+                paddle2.update(deltaTime, screenWidth / 2 + 3, screenWidth);
+                int ballSize = b.getWidth();
+                double x2 = paddle2.getX() + paddle2.getWidth() / 2 - ballSize / 2;
+                double y2 = paddle2.getY() - ballSize - 2;
+                b.setX(x2);
+                b.setY(y2);
+            }
         } else {
-            ball2.update(deltaTime, screenWidth / 2 + 3, screenWidth);
+            Iterator<Ball> it2 = balls2.iterator();
+            while (it2.hasNext()) {
+                Ball b = it2.next();
+                b.update(deltaTime, screenWidth / 2 + 3, screenWidth);
+                if (b.checkCollision(paddle2)) b.bounceOff(paddle2);
+                checkBricksForBall(b, brick2, false);
+                if (b.getY() > screenHeight) {
+                    it2.remove();
+                }
+            }
         }
 
-        // Khi bóng rơi ra ngoài màn hình
-        if (ball1.getY() > screenHeight) {
+        // Nếu không còn bóng của player1 => mất mạng / reset
+        if (balls1.isEmpty()) {
             lives1--;
-            resetBallOnPaddle(ball1, paddle1);
-            gameStarted1 = false; // chỉ dừng player 1
-        }
-        if (ball2.getY() > screenHeight) {
-            lives2--;
-            resetBallOnPaddle(ball2, paddle2);
-            gameStarted2 = false; // chỉ dừng player 2
+            if(lives1 != 0 ) {
+                SoundManager.lostLive();
+            }
+            // reset lại 1 quả bóng dính paddle và dừng player
+            Ball newBall = createBallOnPaddle(paddle1);
+            balls1.add(newBall);
+            gameStarted1 = false;
+            powerUpManager1.clearAll();
         }
 
+        // Nếu không còn bóng của player2 => mất mạng / reset
+        if (balls2.isEmpty()) {
+            lives2--;
+            if (lives2 != 0) {
+                SoundManager.lostLive();
+            }
+            Ball newBall = createBallOnPaddle(paddle2);
+            balls2.add(newBall);
+            gameStarted2 = false;
+            powerUpManager2.clearAll();
+        }
+
+        // Cập nhật vị trí và trạng thái paddle
         paddle1.update(deltaTime, 0, screenWidth / 2);
         paddle2.update(deltaTime, screenWidth / 2 + 3, screenWidth);
 
-        if (ball1.checkCollision(paddle1)) ball1.bounceOff(paddle1);
-        if (ball2.checkCollision(paddle2)) ball2.bounceOff(paddle2);
+        // Cập nhật PowerUp manager (rơi, va chạm với paddle, active effect, ...)
+        powerUpManager1.update(deltaTime, paddle1);
+        powerUpManager2.update(deltaTime, paddle2);
+        if (lives1 * lives2 == 0) {
+            if (lives1 == 0) {
+                winPlayer = 2;
+                winScores = score2;
+            } else {
+                winScores = score1;
+                winPlayer = 1;
+            }
+            isGameOver = true;
+            gameOver();
+        }
+    }
 
-        checkBrick(deltaTime, brick1, ball1, true);
-        checkBrick(deltaTime, brick2, ball2, false);
+    private Ball createBallOnPaddle(Paddle paddle) {
+        int ballSize = 15;
+        double x = paddle.getX() + paddle.getWidth() / 2 - ballSize / 2;
+        double y = paddle.getY() - ballSize - 2;
+        Ball b = new Ball(x, y, ballSize, 4, false);
+        return b;
+    }
+
+    private void checkBricksForBall(Ball ball, List<Brick> bricks, boolean isPlayer1) {
+        int destroyed = -1;
+        int index = 0;
+        for (Brick br : bricks) {
+            if (ball.checkCollision(br)) {
+                if (!ball.isPiercing()) {
+                    ball.bounceOff(br);
+                    br.takeHit(ball);
+                } else if (ball.isPiercing()) {
+                    int hp = br.getHitPoints();
+                    if (hp <= 2) {
+                        br.destroy(); // phá gạch hoàn toàn
+                        // xuyên qua, không đổi hướng
+                    } else {
+                        ball.bounceOff(br);
+                        br.reduceHp(2);
+                        // trừ 2 HP
+                        // Sau đó bật lại như bình thường
+                    }
+                }
+                if (br.isDestroyed()) {
+                    destroyed = index;
+                    if (isPlayer1) {
+                        score1 += 10;
+                        if (score1 != 0 && score1 % 30 == 0) {
+                            powerUpManager1.spawnPowerUp((int) br.getX(), (int) br.getY());
+                        }
+                        if (score1 > score2 && score1 % 100 == 0) {
+                            lives2--;
+                            if(lives2 != 0) {
+                                SoundManager.lostLive();
+                            }
+                        }
+                    } else {
+                        score2 += 10;
+                        if (score2 != 0 && score2 % 30 == 0) {
+                            powerUpManager2.spawnPowerUp((int) br.getX(), (int) br.getY());
+                        }
+                        if (score2 > score1 && score2 % 100 == 0) {
+                            lives1--;
+                            if (lives1 != 0){
+                                SoundManager.lostLive();
+                            }
+                        }
+                    }
+                }
+            }
+            index++;
+        }
+        if (destroyed != -1) bricks.remove(destroyed);
     }
 
     private void resetBallOnPaddle(Ball ball, Paddle paddle) {
@@ -213,24 +375,8 @@ public class GameManager2Player {
         ball.setY(y);
     }
 
-    public void checkBrick(double deltaTime, List<Brick> bricks, Ball ball, boolean isPlayer1) {
-        int destroyed = -1, index = 0;
-        for (Brick br : bricks) {
-            if (ball.checkCollision(br)) {
-                ball.bounceOff(br);
-                br.takeHit(ball);
-                if (br.isDestroyed()) {
-                    destroyed = index;
-                    if (isPlayer1) score1 += 10;
-                    else score2 += 10;
-                }
-            }
-            index++;
-        }
-        if (destroyed != -1) bricks.remove(destroyed);
-    }
-
     public void render() {
+        if (isGameOver) return;
         renderer.clear(screenWidth, screenHeight);
         renderer.getGc().drawImage(image, 0, 0, screenWidth, screenHeight);
         // Đường chia giữa
@@ -266,7 +412,7 @@ public class GameManager2Player {
         gc.setStroke(Color.web("#e0f7fa"));
         gc.setLineWidth(2);
         if (!gameReady) {
-            gc.fillText("PRESS SPACE TO START",250, screenHeight / 2);
+            gc.fillText("PRESS SPACE TO START", 250, screenHeight / 2);
             gc.strokeText("PRESS SPACE TO START", 250, screenHeight / 2);
             return;
         }
@@ -286,8 +432,8 @@ public class GameManager2Player {
         gc.strokeText("PLAYER 2", screenWidth - 180, 40);
         gc.fillText("Score: " + score2, screenWidth - 140, 580);
         gc.strokeText("Score: " + score2, screenWidth - 140, 580);
-        gc.fillText("Lives: " , screenWidth - 360, 580);
-        gc.strokeText("Lives: " , screenWidth - 360, 580);
+        gc.fillText("Lives: ", screenWidth - 360, 580);
+        gc.strokeText("Lives: ", screenWidth - 360, 580);
         int start2 = 520;
         for (int i = 1; i <= lives2; i++) {
             renderer.getGc().drawImage(imageLife, start2, 565, 20, 20);
@@ -298,10 +444,39 @@ public class GameManager2Player {
 
         for (Brick brick : brick1) renderer.draw(brick);
         for (Brick brick : brick2) renderer.draw(brick);
-        renderer.draw(ball1);
+
+        // vẽ tất cả bóng của player1 và player2
+        for (Ball b : balls1) renderer.draw(b);
+        for (Ball b : balls2) renderer.draw(b);
+
+        // vẽ paddle
         renderer.draw(paddle1);
-        renderer.draw(ball2);
         renderer.draw(paddle2);
 
+        // vẽ powerups (hai manager)
+        powerUpManager1.render(renderer.getGc());
+        powerUpManager2.render(renderer.getGc());
     }
+
+    public void gameOver() {
+        SoundManager.stopMusic(SoundManager.MPlayer);
+        SoundManager.GameOver();
+        System.out.println("GAME OVER");
+        SoundManager.playBackgroundMusic(true);
+        // tuỳ bạn: reset level, show menu,...
+        if (stage != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/GameOver2Player.fxml"));
+                Scene menuScene = new Scene(loader.load());
+                MenuController ct = loader.getController();
+                ct.setWin2PL(winPlayer);
+                ct.setScore2PL(winScores);
+                ct.setMainApp(this.mainApp);
+                stage.setScene(menuScene);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Game.MenuController">
+    <ImageView fx:id="background" fitHeight="600" fitWidth="800" preserveRatio="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+        <image>
+            <Image url="@../Image/GO2PLayer.png" />
+        </image>
+    </ImageView>
+   <Label fx:id ="Win2PL" layoutX="288.0" layoutY="427.0" prefHeight="35.0" prefWidth="189.0" text="PLAYER 2 WIN">
+      <font>
+         <Font name="Berlin Sans FB Bold" size="25.0" />
+      </font>
+      <textFill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.8771929740905762" green="0.18139484524726868" blue="0.18139484524726868" />
+                  </color>
+               </Stop>
+               <Stop offset="0.6420581655480985">
+                  <color>
+                     <Color red="0.8972343802452087" green="0.9035087823867798" blue="0.7780214548110962" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="0.8972343802452087" green="0.9035087823867798" blue="0.7780214548110962" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </textFill>
+   </Label>
+   <Label fx:id ="Score2PL" layoutX="279.0" layoutY="469.0" prefHeight="35.0" prefWidth="241.0" text="HIGH SCORES : 0">
+      <font>
+         <Font name="Britannic Bold" size="25.0" />
+      </font>
+      <textFill>
+         <LinearGradient endX="1.0" endY="1.0">
+            <stops>
+               <Stop>
+                  <color>
+                     <Color red="0.8771929740905762" green="0.18139484524726868" blue="0.18139484524726868" />
+                  </color>
+               </Stop>
+               <Stop offset="0.6420581655480985">
+                  <color>
+                     <Color red="0.8972343802452087" green="0.9035087823867798" blue="0.7780214548110962" />
+                  </color>
+               </Stop>
+               <Stop offset="1.0">
+                  <color>
+                     <Color red="0.8972343802452087" green="0.9035087823867798" blue="0.7780214548110962" />
+                  </color>
+               </Stop>
+            </stops>
+         </LinearGradient>
+      </textFill>
+   </Label>
+    <Button fx:id="GO2QuitButton" layoutX="592.0" layoutY="538.0" mnemonicParsing="false" onAction="#GOQuitClick" prefHeight="20.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="QUIT" textFill="#1c3078">
+        <font>
+            <Font name="Berlin Sans FB Bold" size="18.0" />
+        </font>
+    </Button>
+    <Button fx:id="GO2MenuButton" layoutX="116.0" layoutY="538.0" mnemonicParsing="false" onAction="#BackClick" prefHeight="20.0" prefWidth="100.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="MENU" textFill="#1c3078">
+        <font>
+            <Font name="Berlin Sans FB Bold" size="18.0" />
+        </font>
+    </Button>
+</AnchorPane>

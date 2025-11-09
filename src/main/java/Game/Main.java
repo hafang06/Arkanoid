@@ -53,11 +53,11 @@ public class Main extends Application {
         // Nếu không → dùng GameManager
         Object gm;
         if (isTwoPlayer) {
-            gm = new GameManager2Player(gc);
+            gm = new GameManager2Player(gc,mainStage,this);
             SoundManager.stopMusic(SoundManager.bgPlayer);
         } else {
             SoundManager.stopMusic(SoundManager.bgPlayer);
-            gm = new GameManager(gc,mainStage);
+            gm = new GameManager(gc,mainStage,this);
         }
 
         Scene gameScene = new Scene(new StackPane(canvas));
