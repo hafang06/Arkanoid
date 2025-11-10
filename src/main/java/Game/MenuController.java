@@ -75,6 +75,11 @@ public class MenuController {
         }
     }
 
+    @FXML
+    private void onResume(){
+        mainApp.resumeGame();
+    }
+
     public void BackClick(ActionEvent actionEvent) {
         try {
             mainApp.showMenu();
