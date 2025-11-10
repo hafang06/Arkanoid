@@ -58,6 +58,7 @@ public class GameManager {
     private boolean spacePressed = false;
     private boolean gameStarted = false;
     private boolean isGameOver = false;
+    private boolean isPaused = false;
 
     private Stage stage;
     private Main mainApp;
@@ -132,6 +133,7 @@ public class GameManager {
     //update all object every frame
     public void updateGame(double deltaTime) {
         if(isGameOver) return;
+        if(isPaused) return;
         handleInput();
         if (!gameStarted) {
             // Giữ bóng đầu tiên bám theo paddle trước khi bắn; đảm bảo chỉ 1 bóng lúc này
@@ -246,6 +248,7 @@ public class GameManager {
 
     //render all object every frame
     public void render() {
+        if(isPaused) return;
         renderer.clear(screenWidth, screenHeight);
         if (BackGround != null) {
             renderer.drawBackground(BackGround, screenWidth, screenHeight);
@@ -397,15 +400,20 @@ public class GameManager {
         if (key == KeyCode.LEFT)  leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
         if(key == KeyCode.TAB) spacePressed = true;
-        if (key == KeyCode.S) saveGame("save.json");
-        if (key == KeyCode.L) loadGame("save.json");
         if (key == KeyCode.SPACE) spacePressed = true; // SPACE để bắt đầu
+        if (key == KeyCode.ESCAPE){
+            togglePause();
+            mainApp.showPauseMenu();
+        }
+        System.out.println("Pressed: " + key);
+
     }
 
     public void onKeyReleased(KeyCode key) {
         if (key == KeyCode.LEFT)  leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
         if (key == KeyCode.SPACE) spacePressed = false; // nhả SPACE -> false
+
     }
 
     public void checkCollisions() {}
@@ -428,4 +436,27 @@ public class GameManager {
             }
         }
     }
+
+    //Pause game
+    public void togglePause() {
+        isPaused = !isPaused;
+    }
+
+    public void pauseGame() {
+        isPaused = true;
+        //SoundManager.pauseMusic();
+        System.out.println("Game paused");
+    }
+
+    public void resumeGame() {
+        isPaused = false;
+        //SoundManager.resumeMusic();
+
+        System.out.println("Game resumed");
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
 }
