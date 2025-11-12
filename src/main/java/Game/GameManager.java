@@ -75,10 +75,10 @@ public class GameManager {
         this.stage = stage;
         this.mainApp = mainApp;
         // Paddle khởi tạo
-        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 10);
+        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
 
         // Map & bricks
-        currentLevel = 7;
+        currentLevel = 1;
         loadCurrentMap();
     }
 
@@ -88,7 +88,7 @@ public class GameManager {
         int ballSize = 15;
         double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
         double ballY = paddle.getY() - ballSize - 2;
-        Ball b = new Ball(ballX, ballY, ballSize, 10,false);
+        Ball b = new Ball(ballX, ballY, ballSize, 4,false);
 
         if (currentLevel == 7) {
             b.setDirectionY(1); // bình thường: -1 (lên), bây giờ: +1 (xuống)
@@ -299,7 +299,6 @@ public class GameManager {
         gc.setFont(Font.font("Arial Black", FontWeight.EXTRA_BOLD, 20));
         gc.setFill(silverGradient);
         gc.setLineWidth(2);
-        gc.setEffect(glow);
         gc.fillText("Score: " + score, 600, 30);
         gc.fillText("Lives: ", 30, 30);
 

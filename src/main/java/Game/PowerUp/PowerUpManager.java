@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  *  - Ball sink/balls supplier để thêm bóng và lấy danh sách bóng hiện có.
  */
 public class PowerUpManager {
-    private static final double GLOBAL_DROP_RATE = 0.2; // 20% tổng xác suất rơi
+    private static final double GLOBAL_DROP_RATE = 1; // 20% tổng xác suất rơi
 
     private double FASTBALL_DROP_RATE  = 0.1 * GLOBAL_DROP_RATE;
     private double EXPAND_DROP_RATE    = 0.1 * GLOBAL_DROP_RATE;
