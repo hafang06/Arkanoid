@@ -16,7 +16,7 @@
             <Image url="@../Image/GameOver.png" />
         </image>
     </ImageView>
-   <Label fx:id ="scoreLabel"  layoutX="317.0" layoutY="459.0" prefHeight="38.0" prefWidth="218.0" text="Scorce : 0">
+   <Label fx:id ="scoreLabel"  layoutX="317.0" layoutY="459.0" prefHeight="38.0" prefWidth="218.0" text="Scores : 0">
       <font>
          <Font name="Bernard MT Condensed" size="30.0" />
       </font>

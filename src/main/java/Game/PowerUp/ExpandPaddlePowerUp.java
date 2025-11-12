@@ -10,7 +10,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     private int originalWidth;
     private int originalHeight;
 
-    private static final Image IMG = new Image(
+    private static final transient Image IMG = new Image(
             ExpandPaddlePowerUp.class.getResource("/Image/PowerUp/expand.png").toExternalForm()
     );
 

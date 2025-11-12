@@ -9,7 +9,7 @@ import java.util.List;
 public class FireballPowerUp extends PowerUp {
     private boolean isActive = false;
 
-    private static final Image IMG = new Image(
+    private static  transient Image IMG = new Image(
             FireballPowerUp.class.getResource("/Image/PowerUp/fireball.png").toExternalForm()
     );
 

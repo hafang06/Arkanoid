@@ -12,6 +12,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +59,7 @@ public class GameManager {
     private boolean spacePressed = false;
     private boolean gameStarted = false;
     private boolean isGameOver = false;
+    private boolean isPaused = false;
 
     private Stage stage;
     private Main mainApp;
@@ -145,6 +147,7 @@ public class GameManager {
     //update all object every frame
     public void updateGame(double deltaTime) {
         if(isGameOver) return;
+        if(isPaused) return;
         handleInput();
         if (!gameStarted) {
             // Giữ bóng đầu tiên bám theo paddle trước khi bắn; đảm bảo chỉ 1 bóng lúc này
@@ -276,6 +279,7 @@ public class GameManager {
 
     //render all object every frame
     public void render() {
+        if(isPaused) return;
         renderer.clear(screenWidth, screenHeight);
         if (BackGround != null) {
             renderer.drawBackground(BackGround, screenWidth, screenHeight);
@@ -388,15 +392,12 @@ public class GameManager {
     public void saveGame(String fileName){
         GameState curState = new GameState();
 
-        // Lưu trạng thái ball: nếu có nhiều bóng, lưu trạng thái của quả đầu (đơn giản)
+        //save balls
         if (!balls.isEmpty()) {
-            Ball b = balls.get(0);
-            curState.setBallX(b.getX());
-            curState.setBallY(b.getY());
-            curState.setBallDirectionX(b.getDirectionX());
-            curState.setBallDirectionY(b.getDirectionY());
-            curState.setBallDX(b.getDx());
-            curState.setBallDY(b.getDy());
+            for(int i = 0; i < balls.size(); i++){
+                curState.balls.add(balls.get(i));
+            }
+
         }
 
         //save paddle state
@@ -408,39 +409,64 @@ public class GameManager {
         curState.setLives(lives);
         curState.setScore(score);
 
+        //save current level
+        curState.setLevel(currentLevel);
+
         //save brick state
         for(Brick brick : bricks){
             curState.bricks.add(new GameState.BrickState(brick.getX(), brick.getY(), brick.isDestroyed(), brick.getHitPoints()));
         }
 
-        //save to json file
-        try (FileWriter writer = new FileWriter(fileName)) {
+        //save powerUp
+        //curState.setPowerUpManager(powerUpManager);
+
+        //save to json file in user's home directory
+        String userHome = System.getProperty("user.home");
+        File saveDir = new File(userHome, "ArkanoidSave");
+        if (!saveDir.exists()) saveDir.mkdirs(); // tạo thư mục nếu chưa có
+
+        File saveFile = new File(saveDir, "save.json");
+
+        try (FileWriter writer = new FileWriter(saveFile)) {
             Gson gson = new Gson();
             gson.toJson(curState, writer);
-            System.out.println("Game saved to " + fileName);
+            System.out.println("Game saved to: " + saveFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     //Load Game
     public void loadGame(String fileName){
-        try (FileReader reader = new FileReader(fileName)) {
+        String userHome = System.getProperty("user.home");
+        File saveFile = new File(userHome, "ArkanoidSave/save.json");
+
+        if (!saveFile.exists()) {
+            System.out.println("⚠Save file not found: " + saveFile.getAbsolutePath());
+            return;
+        }
+
+        try (FileReader reader = new FileReader(saveFile)) {
             Gson gson = new Gson();
             GameState state = gson.fromJson(reader, GameState.class);
 
             //load ball (đặt lại 1 bóng chính theo file)
             ensureSingleBallAttachedToPaddle();
-            if (!balls.isEmpty()) {
-                Ball b = balls.get(0);
-                b.setX(state.getBallX());
-                b.setY(state.getBallY());
-                b.setDx(state.getBallDX());
-                b.setDy(state.getBallDY());
-                b.setDirectionX(state.getBallDirectionX());
-                b.setDirectionY(state.getBallDirectionY());
+            balls.clear();
+            for(int i = 0; i < state.balls.size(); i++){
+                balls.add(state.balls.get(i));
             }
+
+            //load powerUpManager
+            powerUpManager = new PowerUpManager(screenHeight);
+            powerUpManager.setBallSink(balls::add);
+            powerUpManager.setBallsSupplier(() -> balls);
+            powerUpManager.setFireBallSkin("/Image/PowerUp/ballfire.png");
+//            powerUpManager.setBallSink(balls::add);
+//            powerUpManager.setBallsSupplier(() -> balls);
+
+            //load level
+            currentLevel = state.getLevel();
 
             //load paddle
             paddle.setX(state.getPaddleX());
@@ -465,15 +491,20 @@ public class GameManager {
         if (key == KeyCode.LEFT)  leftPressed = true;
         if (key == KeyCode.RIGHT) rightPressed = true;
         if(key == KeyCode.TAB) spacePressed = true;
-        if (key == KeyCode.S) saveGame("save.json");
-        if (key == KeyCode.L) loadGame("save.json");
         if (key == KeyCode.SPACE) spacePressed = true; // SPACE để bắt đầu
+        if (key == KeyCode.ESCAPE){
+            togglePause();
+            mainApp.showPauseMenu();
+        }
+        System.out.println("Pressed: " + key);
+
     }
 
     public void onKeyReleased(KeyCode key) {
         if (key == KeyCode.LEFT)  leftPressed = false;
         if (key == KeyCode.RIGHT) rightPressed = false;
         if (key == KeyCode.SPACE) spacePressed = false; // nhả SPACE -> false
+
     }
 
     public void checkCollisions() {}
@@ -496,4 +527,27 @@ public class GameManager {
             }
         }
     }
+
+    //Pause game
+    public void togglePause() {
+        isPaused = !isPaused;
+    }
+
+    public void pauseGame() {
+        isPaused = true;
+        //SoundManager.pauseMusic();
+        System.out.println("Game paused");
+    }
+
+    public void resumeGame() {
+        isPaused = false;
+        //SoundManager.resumeMusic();
+
+        System.out.println("Game resumed");
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
 }

@@ -10,7 +10,7 @@ public abstract class PowerUp extends GameObject {
     protected String type;
     protected double duration;       // giây
     protected double dy = 120.0;     // tốc độ rơi px/giây
-    protected Image image;           // ảnh hiển thị item rơi
+    protected transient Image image;           // ảnh hiển thị item rơi
 
     public PowerUp(int x, int y, int width, int height, String type, double duration) {
         super(x, y, width, height);
@@ -35,7 +35,7 @@ public abstract class PowerUp extends GameObject {
             try {
                 var is = getClass().getResourceAsStream(path);
                 if (is != null) {
-                    Image img = new Image(is);
+                     Image img = new Image(is);
                     if (img.getWidth() > 0) {
                         this.image = img;
                         return;

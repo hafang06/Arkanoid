@@ -9,7 +9,7 @@ public class FastBallPowerUp extends PowerUp {
     private boolean isActive = false;
     private int originalSpeed;
 
-    private static final Image IMG = new Image(
+    private static final transient Image IMG = new Image(
             FastBallPowerUp.class.getResource("/Image/PowerUp/fastball.png").toExternalForm()
     );
 

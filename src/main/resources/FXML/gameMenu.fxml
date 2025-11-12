@@ -22,7 +22,7 @@
          <Font name="Berlin Sans FB Bold" size="17.0" />
       </font>
    </Button>
-    <Button fx:id="ResumeButton" layoutX="144.0" layoutY="464.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="180.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="RESUME" textFill="#1c3078">
+    <Button fx:id="ResumeButton" layoutX="144.0" layoutY="464.0" mnemonicParsing="false" onAction="#onResume" prefHeight="20.0" prefWidth="180.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="RESUME" textFill="#1c3078">
         <font>
             <Font name="Berlin Sans FB Bold" size="17.0" />
         </font>
@@ -32,7 +32,7 @@
             <Font name="Berlin Sans FB Bold" size="17.0" />
         </font>
     </Button>
-    <Button fx:id="exitButton" layoutX="144.0" layoutY="519.0" mnemonicParsing="false"  onAction= "#onExitClick" prefHeight="20.0" prefWidth="180.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="QUIT" textFill="#1c3078">
+    <Button fx:id="exitButton" layoutX="144.0" layoutY="519.0" mnemonicParsing="false" onAction="#onExitClick" prefHeight="20.0" prefWidth="180.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #1b2f79 0.0%, #ffffff 100.0%);" text="QUIT" textFill="#1c3078">
         <font>
             <Font name="Berlin Sans FB Bold" size="17.0" />
         </font>
