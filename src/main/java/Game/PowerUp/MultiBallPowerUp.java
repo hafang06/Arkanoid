@@ -7,7 +7,7 @@ public class MultiBallPowerUp extends PowerUp {
     private boolean executed = false;
     private final PowerUpManager manager;
 
-    private static final Image IMG = new Image(
+    private static final transient Image IMG = new Image(
             MultiBallPowerUp.class.getResource("/Image/PowerUp/multiball.png").toExternalForm()
     );
 

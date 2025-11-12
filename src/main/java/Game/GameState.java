@@ -1,19 +1,22 @@
 package Game;
 
+import Game.PowerUp.PowerUp;
+import Game.PowerUp.PowerUpManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
-    private double ballX, ballY;
-    private double ballDX, ballDY;
-    private double ballDirectionX, ballDirectionY;
-
+    private PowerUpManager powerUpManager;
     private double paddleX, paddleY;
     private int paddleSpeed;
     private int score;
     private int lives;
 
+    private int level;
+
     public List<BrickState> bricks = new ArrayList<>();
+    public List<Ball> balls = new ArrayList<>();
 
     public static class BrickState{
         private double x, y;
@@ -62,6 +65,22 @@ public class GameState {
         }
     }
 
+    public PowerUpManager getPowerUpManager() {
+        return powerUpManager;
+    }
+
+    public void setPowerUpManager(PowerUpManager powerUpManager) {
+        this.powerUpManager = powerUpManager;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
     public int getLives() {
         return lives;
     }
@@ -100,53 +119,5 @@ public class GameState {
 
     public void setPaddleX(double paddleX) {
         this.paddleX = paddleX;
-    }
-
-    public double getBallDY() {
-        return ballDY;
-    }
-
-    public void setBallDY(double ballDY) {
-        this.ballDY = ballDY;
-    }
-
-    public double getBallDX() {
-        return ballDX;
-    }
-
-    public void setBallDX(double ballDX) {
-        this.ballDX = ballDX;
-    }
-
-    public double getBallY() {
-        return ballY;
-    }
-
-    public void setBallY(double ballY) {
-        this.ballY = ballY;
-    }
-
-    public double getBallX() {
-        return ballX;
-    }
-
-    public void setBallX(double ballX) {
-        this.ballX = ballX;
-    }
-
-    public double getBallDirectionX() {
-        return ballDirectionX;
-    }
-
-    public void setBallDirectionX(double ballDirectionX) {
-        this.ballDirectionX = ballDirectionX;
-    }
-
-    public double getBallDirectionY() {
-        return ballDirectionY;
-    }
-
-    public void setBallDirectionY(double ballDirectionY) {
-        this.ballDirectionY = ballDirectionY;
     }
 }

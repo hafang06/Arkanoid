@@ -11,8 +11,8 @@
             <Image url="@../Image/PauseMenu.png" />
         </image>
     </ImageView>
-   <Button fx:id="btnResume" layoutX="101.0" layoutY="374.0" mnemonicParsing="false" onAction="#onResumeClicked" prefHeight="44.0" prefWidth="163.0" text="Resume" />
-   <Button fx:id="btnSaveAndQuit" layoutX="282.0" layoutY="374.0" mnemonicParsing="false" onAction="#onSaveAndQuitClicked" prefHeight="44.0" prefWidth="232.0" text="Save And Quit" />
-   <Button fx:id="btnQuit" layoutX="536.0" layoutY="374.0" mnemonicParsing="false" onAction="#onQuitClicked" prefHeight="44.0" prefWidth="147.0" text="Quit" />
+   <Button fx:id="btnResume" blendMode="SCREEN" layoutX="101.0" layoutY="374.0" mnemonicParsing="false" onAction="#onResumeClicked" prefHeight="44.0" prefWidth="163.0" style="-fx-background-color: #b26cff; -fx-text-fill: white; -fx-border-color: #e2b8ff; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 16; -fx-font-weight: bold; -fx-font-family: System; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.4), 5, 0, 0, 0);" text="RESUME" />
+   <Button fx:id="btnSaveAndQuit" blendMode="SCREEN" layoutX="282.0" layoutY="374.0" mnemonicParsing="false" onAction="#onSaveAndQuitClicked" prefHeight="44.0" prefWidth="232.0" style="-fx-background-color: #b26cff; -fx-text-fill: white; -fx-border-color: #e2b8ff; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: System; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.4), 5, 0, 0, 0);;" text="SAVE AND QUIT" />
+   <Button fx:id="btnQuit" blendMode="SCREEN" layoutX="531.0" layoutY="374.0" mnemonicParsing="false" onAction="#onQuitClicked" prefHeight="44.0" prefWidth="147.0" style="-fx-background-color: #b26cff; -fx-text-fill: white; -fx-border-color: #e2b8ff; -fx-border-width: 2; -fx-background-radius: 10; -fx-border-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: System; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.4), 5, 0, 0, 0);" text="QUIT" />
 
 </AnchorPane>

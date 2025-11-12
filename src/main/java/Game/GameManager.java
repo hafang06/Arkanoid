@@ -12,6 +12,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -392,15 +393,12 @@ public class GameManager {
     public void saveGame(String fileName){
         GameState curState = new GameState();
 
-        // Lưu trạng thái ball: nếu có nhiều bóng, lưu trạng thái của quả đầu (đơn giản)
+        //save balls
         if (!balls.isEmpty()) {
-            Ball b = balls.get(0);
-            curState.setBallX(b.getX());
-            curState.setBallY(b.getY());
-            curState.setBallDirectionX(b.getDirectionX());
-            curState.setBallDirectionY(b.getDirectionY());
-            curState.setBallDX(b.getDx());
-            curState.setBallDY(b.getDy());
+            for(int i = 0; i < balls.size(); i++){
+                curState.balls.add(balls.get(i));
+            }
+
         }
 
         //save paddle state
@@ -412,39 +410,62 @@ public class GameManager {
         curState.setLives(lives);
         curState.setScore(score);
 
+        //save current level
+        curState.setLevel(currentLevel);
+
         //save brick state
         for(Brick brick : bricks){
             curState.bricks.add(new GameState.BrickState(brick.getX(), brick.getY(), brick.isDestroyed(), brick.getHitPoints()));
         }
 
-        //save to json file
-        try (FileWriter writer = new FileWriter(fileName)) {
+        //save powerUp
+        curState.setPowerUpManager(powerUpManager);
+
+        //save to json file in user's home directory
+        String userHome = System.getProperty("user.home");
+        File saveDir = new File(userHome, "ArkanoidSave");
+        if (!saveDir.exists()) saveDir.mkdirs(); // tạo thư mục nếu chưa có
+
+        File saveFile = new File(saveDir, "save.json");
+
+        try (FileWriter writer = new FileWriter(saveFile)) {
             Gson gson = new Gson();
             gson.toJson(curState, writer);
-            System.out.println("Game saved to " + fileName);
+            System.out.println("Game saved to: " + saveFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     //Load Game
     public void loadGame(String fileName){
+        String userHome = System.getProperty("user.home");
+        File saveFile = new File(userHome, "ArkanoidSave/save.json");
+
+        if (!saveFile.exists()) {
+            System.out.println("⚠Save file not found: " + saveFile.getAbsolutePath());
+            return;
+        }
+
         try (FileReader reader = new FileReader(fileName)) {
             Gson gson = new Gson();
             GameState state = gson.fromJson(reader, GameState.class);
 
             //load ball (đặt lại 1 bóng chính theo file)
             ensureSingleBallAttachedToPaddle();
-            if (!balls.isEmpty()) {
-                Ball b = balls.get(0);
-                b.setX(state.getBallX());
-                b.setY(state.getBallY());
-                b.setDx(state.getBallDX());
-                b.setDy(state.getBallDY());
-                b.setDirectionX(state.getBallDirectionX());
-                b.setDirectionY(state.getBallDirectionY());
+            balls.clear();
+            for(int i = 0; i < state.balls.size(); i++){
+                balls.add(balls.get(i));
             }
+
+            //load powerUpManager
+            powerUpManager = state.getPowerUpManager();
+            if (powerUpManager == null) {
+                powerUpManager = new PowerUpManager(screenHeight);
+            }
+
+            //load level
+            currentLevel = state.getLevel();
 
             //load paddle
             paddle.setX(state.getPaddleX());

@@ -13,8 +13,12 @@ module Game {
     //requires Game;
 
     opens Game to com.google.gson, javafx.fxml;
+    opens Game.Brick to com.google.gson;
+    opens Game.PowerUp to com.google.gson, javafx.fxml;
+    opens Game.Map to com.google.gson;
+
 //    opens Game to javafx.fxml;
     exports Game;
     exports Game.PowerUp;
-    opens Game.PowerUp to javafx.fxml;
+
 }
