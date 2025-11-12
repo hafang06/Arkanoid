@@ -78,7 +78,7 @@ public class GameManager {
         paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 10);
 
         // Map & bricks
-        currentLevel = 1;
+        currentLevel = 7;
         loadCurrentMap();
     }
 
@@ -90,9 +90,9 @@ public class GameManager {
         double ballY = paddle.getY() - ballSize - 2;
         Ball b = new Ball(ballX, ballY, ballSize, 10,false);
 
-//        if (currentLevel == 7) {
-//            b.setDirectionY(1); // bình thường: -1 (lên), bây giờ: +1 (xuống)
-//        }
+        if (currentLevel == 7) {
+            b.setDirectionY(1); // bình thường: -1 (lên), bây giờ: +1 (xuống)
+        }
 
         balls.add(b);
         paddle.setBall(b);
