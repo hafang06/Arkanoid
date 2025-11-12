@@ -31,7 +31,7 @@ public class PowerUpManager {
     private int MAX_PER_TYPE_PER_LEVEL = 2;
     private final Map<String, Integer> perTypeSpawned = new HashMap<>();
 
-    private final Random rng = new Random();
+    private transient final Random rng = new Random();
 
     private final List<PowerUp> items = new ArrayList<>();
 

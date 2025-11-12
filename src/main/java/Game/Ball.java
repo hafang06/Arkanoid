@@ -8,11 +8,11 @@ import javafx.scene.paint.Color;
 public class Ball extends MovableObject {
     private int speed;
     private double directionX, directionY;
-    private Image image;
+    private transient Image image;
     private boolean piercing;
 
-    private static Image IMG_NORMAL;
-    private static Image IMG_FIRE;
+    private static transient Image IMG_NORMAL;
+    private static transient Image IMG_FIRE;
 
     static {
         try {

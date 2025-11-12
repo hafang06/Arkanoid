@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class Map {
     protected List<Brick> bricks;
-    protected Image BackGround;
+    protected transient Image BackGround;
     protected InputStream path;
 
     public Map(Image BackGround, InputStream path){
