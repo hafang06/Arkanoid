@@ -24,6 +24,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.FileWriter;
@@ -40,7 +41,6 @@ public class GameManager {
     private final Renderer renderer;
 
     private final List<GameObject> objects = new ArrayList<>();
-    private final List<Map> maps = new ArrayList<>();
 
     // => SỬ DỤNG 1 LIST DUY NHẤT CHO TẤT CẢ BÓNG
     private final List<Ball> balls = new ArrayList<>();
@@ -66,6 +66,10 @@ public class GameManager {
 
     private PowerUpManager powerUpManager;
 
+    private double elapsedTime = 0; // thời gian trôi qua (giây)
+    private final double RESET_INTERVAL = 180; // 3 phút
+    private double timeRemaining = RESET_INTERVAL; // đếm ngược 3 phút
+
 
     public GameManager(GraphicsContext gc, Stage stage, Main mainApp) {
         this.gc = gc;
@@ -73,16 +77,10 @@ public class GameManager {
         this.stage = stage;
         this.mainApp = mainApp;
         // Paddle khởi tạo
-        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
+        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 10);
 
         // Map & bricks
-        maps.add(new Map1());
-        maps.add(new Map2());
-        maps.add(new Map3());
-        maps.add(new Map4());
-        maps.add(new Map5());
-
-        currentLevel = 1;
+        currentLevel = 7;
         loadCurrentMap();
     }
 
@@ -92,13 +90,28 @@ public class GameManager {
         int ballSize = 15;
         double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
         double ballY = paddle.getY() - ballSize - 2;
-        Ball b = new Ball(ballX, ballY, ballSize, 4,false);
+        Ball b = new Ball(ballX, ballY, ballSize, 10,false);
+
+        if (currentLevel == 7) {
+            b.setDirectionY(1); // bình thường: -1 (lên), bây giờ: +1 (xuống)
+        }
+
         balls.add(b);
         paddle.setBall(b);
     }
 
     private void loadCurrentMap() {
-        Map currentMap = maps.get(currentLevel - 1);
+        Map currentMap;
+        switch (currentLevel) {
+            case 1 -> currentMap = new Map1();
+            case 2 -> currentMap = new Map2();
+            case 3 -> currentMap = new Map3();
+            case 4 -> currentMap = new Map4();
+            case 5 -> currentMap = new Map5();
+            case 6 -> currentMap = new Map6();
+            case 7 -> currentMap = new Map7();
+            default -> currentMap = new Map1();
+        }
         bricks = currentMap.getBricks();
         BackGround = currentMap.getBackGround();
 
@@ -245,6 +258,23 @@ public class GameManager {
 
         // PowerUp: rơi -> nhặt -> (nếu có thời gian) đếm lùi
         powerUpManager.update(deltaTime, paddle);
+
+        elapsedTime += deltaTime;
+        timeRemaining = RESET_INTERVAL - elapsedTime;
+
+        if (currentLevel == 6 && timeRemaining <= 0) {
+            elapsedTime = 0;
+            timeRemaining = RESET_INTERVAL;
+            System.out.println("Reset lại map sau 3 phút!");
+            loadCurrentMap(); // reset map + gạch
+        }
+    }
+
+    private String formatTime(double seconds) {
+        int total = (int) Math.max(seconds, 0);
+        int minutes = total / 60;
+        int secs = total % 60;
+        return String.format("%02d:%02d", minutes, secs);
     }
 
     //render all object every frame
@@ -273,13 +303,48 @@ public class GameManager {
         gc.setFont(Font.font("Arial Black", FontWeight.EXTRA_BOLD, 20));
         gc.setFill(silverGradient);
         gc.setLineWidth(2);
+        gc.setEffect(glow);
         gc.fillText("Score: " + score, 600, 30);
         gc.fillText("Lives: ", 30, 30);
+
         int start1 = 115;
         for (int i = 1; i <= lives; i++) {
             renderer.getGc().drawImage(imageLife, start1, 15, 20, 20);
             start1 += 25;
         }
+
+// === Hiển thị timer cho map 6 ===
+        if (currentLevel == 6) {
+            String timerText = formatTime(timeRemaining);
+
+            // Khi còn <= 10 giây thì chữ nhấp nháy đỏ
+            if (timeRemaining <= 11) {
+                // Nhấp nháy mỗi giây (sáng tắt xen kẽ)
+                if (((int) timeRemaining) % 2 == 0)
+                    gc.setFill(Color.RED);
+                else
+                    gc.setFill(silverGradient);
+            } else {
+                gc.setFill(silverGradient);
+            }
+
+            gc.setEffect(glow);
+
+            // Canh giữa chính xác (sử dụng đo độ rộng text)
+            Text tempText = new Text(timerText);
+            tempText.setFont(gc.getFont());
+            double textWidth = tempText.getLayoutBounds().getWidth();
+//
+            gc.fillText(timerText, (screenWidth - textWidth) / 2, 40);
+            gc.setEffect(null);
+        }
+
+        if (currentLevel == 7) {
+            gc.save();                     // Lưu trạng thái hiện tại
+            gc.translate(0, screenHeight); // Dịch gốc tọa độ xuống đáy màn hình
+            gc.scale(1, -1);               // Lật ngược trục Y (trên <-> dưới)
+        }
+
         for (Brick brick : bricks) {
             renderer.draw(brick);
         }
@@ -294,6 +359,10 @@ public class GameManager {
 
         // Vẽ item power-up đang rơi
         powerUpManager.render(gc);
+
+        if (currentLevel == 7) {
+            gc.restore(); // Trả lại trạng thái bình thường
+        }
     }
 
     //current movement
