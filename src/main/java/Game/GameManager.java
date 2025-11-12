@@ -75,7 +75,7 @@ public class GameManager {
         this.stage = stage;
         this.mainApp = mainApp;
         // Paddle khởi tạo
-        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 4);
+        paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 10);
 
         // Map & bricks
         currentLevel = 1;
@@ -88,7 +88,12 @@ public class GameManager {
         int ballSize = 15;
         double ballX = paddle.getX() + paddle.getWidth() / 2.0 - ballSize / 2.0;
         double ballY = paddle.getY() - ballSize - 2;
-        Ball b = new Ball(ballX, ballY, ballSize, 4,false);
+        Ball b = new Ball(ballX, ballY, ballSize, 10,false);
+
+//        if (currentLevel == 7) {
+//            b.setDirectionY(1); // bình thường: -1 (lên), bây giờ: +1 (xuống)
+//        }
+
         balls.add(b);
         paddle.setBall(b);
     }
@@ -102,6 +107,7 @@ public class GameManager {
             case 4 -> currentMap = new Map4();
             case 5 -> currentMap = new Map5();
             case 6 -> currentMap = new Map6();
+            case 7 -> currentMap = new Map7();
             default -> currentMap = new Map1();
         }
         bricks = currentMap.getBricks();
@@ -297,6 +303,12 @@ public class GameManager {
         gc.fillText("Score: " + score, 600, 30);
         gc.fillText("Lives: ", 30, 30);
 
+        int start1 = 115;
+        for (int i = 1; i <= lives; i++) {
+            renderer.getGc().drawImage(imageLife, start1, 15, 20, 20);
+            start1 += 25;
+        }
+
 // === Hiển thị timer cho map 6 ===
         if (currentLevel == 6) {
             String timerText = formatTime(timeRemaining);
@@ -323,11 +335,12 @@ public class GameManager {
             gc.setEffect(null);
         }
 
-        int start1 = 115;
-        for (int i = 1; i <= lives; i++) {
-            renderer.getGc().drawImage(imageLife, start1, 15, 20, 20);
-            start1 += 25;
+        if (currentLevel == 7) {
+            gc.save();                     // Lưu trạng thái hiện tại
+            gc.translate(0, screenHeight); // Dịch gốc tọa độ xuống đáy màn hình
+            gc.scale(1, -1);               // Lật ngược trục Y (trên <-> dưới)
         }
+
         for (Brick brick : bricks) {
             renderer.draw(brick);
         }
@@ -342,6 +355,10 @@ public class GameManager {
 
         // Vẽ item power-up đang rơi
         powerUpManager.render(gc);
+
+        if (currentLevel == 7) {
+            gc.restore(); // Trả lại trạng thái bình thường
+        }
     }
 
     //current movement
