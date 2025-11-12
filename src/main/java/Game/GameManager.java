@@ -80,7 +80,7 @@ public class GameManager {
         paddle = new Paddle(screenWidth / 2.0 - 50, screenHeight - 40, 100, 20, 10);
 
         // Map & bricks
-        currentLevel = 7;
+        currentLevel = 1;
         loadCurrentMap();
     }
 
@@ -303,7 +303,6 @@ public class GameManager {
         gc.setFont(Font.font("Arial Black", FontWeight.EXTRA_BOLD, 20));
         gc.setFill(silverGradient);
         gc.setLineWidth(2);
-        gc.setEffect(glow);
         gc.fillText("Score: " + score, 600, 30);
         gc.fillText("Lives: ", 30, 30);
 
@@ -419,7 +418,7 @@ public class GameManager {
         }
 
         //save powerUp
-        curState.setPowerUpManager(powerUpManager);
+        //curState.setPowerUpManager(powerUpManager);
 
         //save to json file in user's home directory
         String userHome = System.getProperty("user.home");
@@ -447,7 +446,7 @@ public class GameManager {
             return;
         }
 
-        try (FileReader reader = new FileReader(fileName)) {
+        try (FileReader reader = new FileReader(saveFile)) {
             Gson gson = new Gson();
             GameState state = gson.fromJson(reader, GameState.class);
 
@@ -455,14 +454,16 @@ public class GameManager {
             ensureSingleBallAttachedToPaddle();
             balls.clear();
             for(int i = 0; i < state.balls.size(); i++){
-                balls.add(balls.get(i));
+                balls.add(state.balls.get(i));
             }
 
             //load powerUpManager
-            powerUpManager = state.getPowerUpManager();
-            if (powerUpManager == null) {
-                powerUpManager = new PowerUpManager(screenHeight);
-            }
+            powerUpManager = new PowerUpManager(screenHeight);
+            powerUpManager.setBallSink(balls::add);
+            powerUpManager.setBallsSupplier(() -> balls);
+            powerUpManager.setFireBallSkin("/Image/PowerUp/ballfire.png");
+//            powerUpManager.setBallSink(balls::add);
+//            powerUpManager.setBallsSupplier(() -> balls);
 
             //load level
             currentLevel = state.getLevel();
